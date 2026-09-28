@@ -1,0 +1,42 @@
+{% extends "dashboard/base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Services" %} — {{ SITE_NAME }}{% endblock %}
+
+{% block dash %}
+<div class="dash-header"><div><h1>{% trans "Services" %}</h1><p>{% trans "The services customers can book." %}</p></div></div>
+
+<div class="grid" style="grid-template-columns: 1.4fr 1fr; align-items:start; gap:var(--space-5)">
+  <div>
+    {% if services %}
+      <div class="service-list">
+        {% for s in services %}
+          <div class="service-item">
+            <div>
+              <div class="service-item__name">{{ s.name }} {% if not s.is_active %}<span class="badge">{% trans "Hidden" %}</span>{% endif %}</div>
+              {% if s.description %}<div class="service-item__desc">{{ s.description }}</div>{% endif %}
+              {% if s.category %}<small class="muted">{{ s.category.name }}</small>{% endif %}
+            </div>
+            <div class="service-item__meta">
+              <span class="service-item__duration">{{ s.duration_minutes }} {% trans "min" %}</span>
+              <span class="service-item__price">{% if s.show_price and s.price %}{{ s.price|floatformat:"-2" }} {{ DEFAULT_CURRENCY }}{% else %}—{% endif %}</span>
+              <a class="btn btn--sm btn--ghost" href="{% url 'dashboard:service_edit' s.pk %}">{% trans "Edit" %}</a>
+              <form method="post" action="{% url 'dashboard:service_delete' s.pk %}" data-confirm="{% trans 'Delete this service?' %}">{% csrf_token %}<button class="btn btn--sm btn--danger">{% trans "Delete" %}</button></form>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state"><h3>{% trans "No services yet" %}</h3><p>{% trans "Add your first service so customers can book it." %}</p></div>
+    {% endif %}
+  </div>
+
+  <div class="panel" style="padding:var(--space-5)">
+    <h3>{% trans "Add a service" %}</h3>
+    <form method="post" class="form">
+      {% csrf_token %}
+      {% for field in form %}{% include "includes/form_field.html" with field=field %}{% endfor %}
+      <button class="btn btn--primary btn--block" type="submit">{% trans "Add service" %}</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

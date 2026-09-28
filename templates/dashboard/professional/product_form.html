@@ -1,0 +1,16 @@
+{% extends "dashboard/base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Edit product" %} — {{ SITE_NAME }}{% endblock %}
+
+{% block dash %}
+<div class="dash-header"><div><h1>{% trans "Edit product" %}</h1><p>{{ product.name }}</p></div>
+  <a class="btn btn--ghost" href="{% url 'dashboard:products' %}">← {% trans "Back to products" %}</a></div>
+
+<div class="panel" style="padding:var(--space-5); max-width:640px">
+  <form method="post" enctype="multipart/form-data" class="form">
+    {% csrf_token %}
+    {% for field in form %}{% include "includes/form_field.html" with field=field %}{% endfor %}
+    <button class="btn btn--primary" type="submit">{% trans "Save changes" %}</button>
+  </form>
+</div>
+{% endblock %}

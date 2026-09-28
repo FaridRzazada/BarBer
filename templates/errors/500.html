@@ -1,0 +1,12 @@
+{% load i18n static %}<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>Server error</title>
+<link rel="stylesheet" href="{% static 'css/base.css' %}">
+<link rel="stylesheet" href="{% static 'css/components.css' %}"></head>
+<body>
+<div class="page"><div class="container text-center" style="max-width:520px;margin:0 auto">
+  <p class="eyebrow">500</p>
+  <h1>{% trans "Something went wrong" %}</h1>
+  <p class="muted">{% trans "We hit an unexpected error. Please try again in a moment." %}</p>
+  <a class="btn btn--primary" href="/">{% trans "Back to home" %}</a>
+</div></div>
+</body></html>

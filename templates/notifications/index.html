@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Notifications" %} — {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="page"><div class="container" style="max-width:820px">
+  <div class="section__head">
+    <h1 class="section__title">{% trans "Notifications" %}</h1>
+    {% if unread_count %}<button class="btn btn--ghost btn--sm" id="notif-mark-all">{% trans "Mark all read" %}</button>{% endif %}
+  </div>
+
+  <div class="pill-group" style="margin-bottom:var(--space-4)">
+    <a href="?filter=all" class="{% if current_filter != 'unread' %}is-active{% endif %}">{% trans "All" %}</a>
+    <a href="?filter=unread" class="{% if current_filter == 'unread' %}is-active{% endif %}">{% trans "Unread" %} {% if unread_count %}({{ unread_count }}){% endif %}</a>
+  </div>
+
+  {% if notifications %}
+    <div class="notif-list">
+      {% for n in notifications %}
+        <div class="notif {% if not n.is_read %}is-unread{% endif %}" data-notif-id="{{ n.id }}" data-notif-url="{{ n.url|default:'#' }}" style="cursor:pointer">
+          <div class="notif__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/></svg></div>
+          <div style="flex:1">
+            <div class="notif__title">{{ n.title }}</div>
+            <div class="notif__msg">{{ n.message }}</div>
+          </div>
+          <span class="notif__time">{{ n.created_at|timesince }} {% trans "ago" %}</span>
+        </div>
+      {% endfor %}
+    </div>
+    {% include "includes/pagination.html" %}
+  {% else %}
+    <div class="empty-state"><h3>{% trans "You're all caught up" %}</h3><p>{% trans "New notifications will show up here." %}</p></div>
+  {% endif %}
+</div></div>
+{% endblock %}

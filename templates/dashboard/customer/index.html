@@ -1,0 +1,43 @@
+{% extends "dashboard/base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Dashboard" %} — {{ SITE_NAME }}{% endblock %}
+
+{% block dash %}
+<div class="dash-header">
+  <div>
+    <h1>{% trans "Hi" %}, {{ user.display_name }}</h1>
+    <p>{% trans "Here's what's coming up." %}</p>
+  </div>
+  <a class="btn btn--primary" href="{% url 'core:find' %}">{% trans "Find a barber" %}</a>
+</div>
+
+<div class="stat-grid" style="margin-bottom: var(--space-6)">
+  <div class="stat"><div class="stat__label">{% trans "Upcoming" %}</div><div class="stat__value">{{ upcoming|length }}</div></div>
+  <div class="stat"><div class="stat__label">{% trans "Total bookings" %}</div><div class="stat__value">{{ total_bookings }}</div></div>
+  <div class="stat"><div class="stat__label">{% trans "Favorites" %}</div><div class="stat__value">{{ favorites_count }}</div></div>
+</div>
+
+<h2>{% trans "Upcoming appointments" %}</h2>
+{% if upcoming %}
+  <div class="stack">
+    {% for b in upcoming %}
+      <div class="card" style="display:flex;justify-content:space-between;align-items:center;gap:var(--space-4);flex-wrap:wrap">
+        <div>
+          <strong>{{ b.service.name }}</strong> {% trans "with" %} {{ b.professional.display_name }}<br>
+          <span class="muted">{{ b.date }} · {{ b.start_time|time:"H:i" }}–{{ b.end_time|time:"H:i" }}</span>
+        </div>
+        <div class="cluster">
+          <span class="status status--{{ b.status }}">{{ b.get_status_display }}</span>
+          <a class="btn btn--sm" href="{% url 'bookings:detail' b.pk %}">{% trans "Details" %}</a>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="empty-state">
+    <h3>{% trans "No appointments yet" %}</h3>
+    <p>{% trans "Find a barber or salon nearby to book your first appointment." %}</p>
+    <a class="btn btn--primary" href="{% url 'core:find' %}">{% trans "Explore nearby" %}</a>
+  </div>
+{% endif %}
+{% endblock %}

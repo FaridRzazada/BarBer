@@ -1,0 +1,67 @@
+{% extends "dashboard/base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Dashboard" %} — {{ SITE_NAME }}{% endblock %}
+
+{% block dash %}
+<div class="dash-header">
+  <div>
+    <h1>{{ professional.display_name }}</h1>
+    <p>
+      {% if is_open %}<span class="badge badge--open"><span class="status-dot status-dot--open"></span>{% trans "Open now" %}</span>
+      {% else %}<span class="badge badge--closed"><span class="status-dot status-dot--closed"></span>{% trans "Closed" %}</span>{% endif %}
+      {% if professional.is_verified %}<span class="badge badge--verified">✓ {% trans "Verified" %}</span>{% endif %}
+    </p>
+  </div>
+  <a class="btn btn--ghost" href="{{ professional.get_absolute_url }}">{% trans "View public profile" %} →</a>
+</div>
+
+<div class="stat-grid" style="margin-bottom: var(--space-6)">
+  <div class="stat"><div class="stat__label">{% trans "Today" %}</div><div class="stat__value">{{ today_count }}</div></div>
+  <div class="stat"><div class="stat__label">{% trans "Upcoming" %}</div><div class="stat__value">{{ upcoming_count }}</div></div>
+  <div class="stat"><div class="stat__label">{% trans "Completed" %}</div><div class="stat__value">{{ completed_count }}</div></div>
+  <div class="stat"><div class="stat__label">{% trans "Total bookings" %}</div><div class="stat__value">{{ total_count }}</div></div>
+  <div class="stat"><div class="stat__label">{% trans "Rating" %}</div><div class="stat__value">{% if summary.average or rating.average %}{{ rating.average }}{% else %}—{% endif %}</div><div class="stat__hint">{{ rating.count }} {% trans "reviews" %}</div></div>
+</div>
+
+<div class="grid" style="grid-template-columns: 1.6fr 1fr; align-items:start; gap:var(--space-5)">
+  <div>
+    <h2>{% trans "New requests" %}</h2>
+    {% if pending %}
+      <div class="stack">
+        {% for b in pending %}
+          <div class="card" style="display:flex;justify-content:space-between;align-items:center;gap:var(--space-4);flex-wrap:wrap">
+            <div>
+              <strong>{{ b.service.name }}</strong> — {{ b.customer.display_name }}<br>
+              <span class="muted">{{ b.date }} · {{ b.start_time|time:"H:i" }}{% if b.barber %} · {{ b.barber.professional.display_name }}{% endif %}</span>
+            </div>
+            <form method="post" action="{% url 'dashboard:appointments' %}" class="cluster">
+              {% csrf_token %}
+              <input type="hidden" name="booking" value="{{ b.pk }}">
+              <button class="btn btn--sm btn--primary" name="action" value="confirm">{% trans "Confirm" %}</button>
+              <button class="btn btn--sm btn--danger" name="action" value="cancel">{% trans "Decline" %}</button>
+            </form>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state"><p>{% trans "No pending requests right now." %}</p></div>
+    {% endif %}
+  </div>
+
+  <div class="completion">
+    <strong>{% trans "Profile" %} {{ completion.percent }}% {% trans "complete" %}</strong>
+    <div class="completion__bar"><div class="completion__fill" style="width: {{ completion.percent }}%"></div></div>
+    <ul class="completion__list">
+      {% for s in completion.sections %}
+        <li class="{% if s.done %}done{% endif %}">
+          <span class="completion__check">{% if s.done %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg>{% endif %}</span>
+          {{ s.label }}
+        </li>
+      {% endfor %}
+    </ul>
+    {% if not completion.is_complete %}
+      <a class="btn btn--accent btn--block" href="{% url 'dashboard:profile_setup' %}" style="margin-top:var(--space-3)">{% trans "Complete your profile" %}</a>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

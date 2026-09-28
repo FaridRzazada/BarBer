@@ -1,0 +1,28 @@
+{% extends "dashboard/base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Calendar" %} — {{ SITE_NAME }}{% endblock %}
+
+{% block dash %}
+<div class="dash-header"><div><h1>{% trans "Calendar" %}</h1><p>{% trans "Your upcoming agenda." %}</p></div></div>
+
+{% if agenda %}
+  {% for date, items in agenda %}
+    <div class="agenda-day">
+      <div class="agenda-day__date">{{ date|date:"l, j F Y" }}</div>
+      {% for b in items %}
+        <div class="agenda-item">
+          <span class="agenda-item__time">{{ b.start_time|time:"H:i" }}–{{ b.end_time|time:"H:i" }}</span>
+          <div>
+            <strong>{{ b.service.name }}</strong> — {{ b.customer.display_name }}
+            {% if b.barber %}<span class="muted"> · {{ b.barber.professional.display_name }}</span>{% endif %}
+          </div>
+          <span class="status status--{{ b.status }}" style="margin-left:auto">{{ b.get_status_display }}</span>
+          <a class="btn btn--sm btn--ghost" href="{% url 'bookings:detail' b.pk %}">{% trans "View" %}</a>
+        </div>
+      {% endfor %}
+    </div>
+  {% endfor %}
+{% else %}
+  <div class="empty-state"><h3>{% trans "Nothing scheduled" %}</h3><p>{% trans "Confirmed and pending appointments will show up here." %}</p></div>
+{% endif %}
+{% endblock %}

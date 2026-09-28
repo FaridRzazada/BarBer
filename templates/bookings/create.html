@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% load static i18n %}
+{% block title %}{% trans "Book" %} {{ professional.display_name }} — {{ SITE_NAME }}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<div class="page"><div class="container">
+  <nav class="breadcrumbs"><a href="{{ professional.get_absolute_url }}">← {% trans "Back to" %} {{ professional.display_name }}</a></nav>
+  <h1>{% trans "Book an appointment" %}</h1>
+  <p class="muted">{% trans "with" %} {{ professional.display_name }}</p>
+
+  <div class="wizard" data-booking
+       data-professional="{{ professional.id }}"
+       data-type="{{ professional.professional_type }}"
+       data-preselect-service="{{ preselect_service }}"
+       data-preselect-barber="{{ preselect_barber }}">
+    <div>
+      <div class="wizard__step">
+        <h3>1. {% trans "Choose a service" %}</h3>
+        <div class="option-grid" id="service-options">
+          {% for s in services %}
+            <button type="button" class="option" data-service="{{ s.id }}" data-duration="{{ s.duration_minutes }}"
+                    data-name="{{ s.name }}" data-price="{% if s.show_price and s.price %}{{ s.price|floatformat:'-2' }}{% endif %}" data-currency="{{ DEFAULT_CURRENCY }}">
+              <div class="option__name">{{ s.name }}</div>
+              <div class="option__meta">{{ s.duration_minutes }} {% trans "min" %}{% if s.show_price and s.price %} · {{ s.price|floatformat:"-2" }} {{ DEFAULT_CURRENCY }}{% endif %}</div>
+            </button>
+          {% empty %}
+            <p class="muted">{% trans "This professional hasn't listed services yet." %}</p>
+          {% endfor %}
+        </div>
+      </div>
+
+      {% if professional.is_salon %}
+      <div class="wizard__step">
+        <h3>2. {% trans "Choose a barber" %}</h3>
+        <div class="option-grid" id="barber-options">
+          <button type="button" class="option is-selected" data-barber="" data-name="{% trans 'Any available barber' %}">
+            <div class="option__name">{% trans "Any available barber" %}</div>
+            <div class="option__meta">{% trans "We'll assign a free barber" %}</div>
+          </button>
+          {% for m in team %}
+            <button type="button" class="option" data-barber="{{ m.barber.id }}" data-name="{{ m.barber.professional.display_name }}">
+              <div class="option__name">{{ m.barber.professional.display_name }}</div>
+              <div class="option__meta">{{ m.position|default:"Barber" }}</div>
+            </button>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      <div class="wizard__step">
+        <h3>{% if professional.is_salon %}3{% else %}2{% endif %}. {% trans "Pick a date" %}</h3>
+        <input type="date" id="booking-date" class="form__control" style="max-width:220px">
+      </div>
+
+      <div class="wizard__step">
+        <h3>{% if professional.is_salon %}4{% else %}3{% endif %}. {% trans "Pick a time" %}</h3>
+        <div id="slot-options" class="slot-grid"><p class="toast-empty">{% trans "Pick a service and date to see available times." %}</p></div>
+      </div>
+
+      <div class="wizard__step">
+        <h3>{% trans "Notes" %} <span class="muted">({% trans "optional" %})</span></h3>
+        <textarea id="booking-notes" class="form__control" rows="3" placeholder="{% trans 'Anything the professional should know?' %}"></textarea>
+      </div>
+    </div>
+
+    <aside class="booking-summary panel" style="padding:var(--space-5)">
+      <h3>{% trans "Summary" %}</h3>
+      <dl>
+        <div class="summary-row"><dt>{% trans "Professional" %}</dt><dd>{{ professional.display_name }}</dd></div>
+        <div class="summary-row"><dt>{% trans "Service" %}</dt><dd data-sum-service>—</dd></div>
+        {% if professional.is_salon %}<div class="summary-row"><dt>{% trans "Barber" %}</dt><dd data-sum-barber>{% trans "Any available" %}</dd></div>{% endif %}
+        <div class="summary-row"><dt>{% trans "Date" %}</dt><dd data-sum-date>—</dd></div>
+        <div class="summary-row"><dt>{% trans "Time" %}</dt><dd data-sum-time>—</dd></div>
+        <div class="summary-row"><dt>{% trans "Price" %}</dt><dd data-sum-price>—</dd></div>
+      </dl>
+      {% if user.is_authenticated and user.is_customer %}
+        <button class="btn btn--primary btn--block btn--lg" id="booking-confirm" style="margin-top:var(--space-4)">{% trans "Confirm booking" %}</button>
+      {% elif user.is_authenticated %}
+        <p class="muted">{% trans "Only customer accounts can book." %}</p>
+      {% else %}
+        <a class="btn btn--primary btn--block btn--lg" href="{% url 'accounts:login' %}?next={{ request.get_full_path|urlencode }}" style="margin-top:var(--space-4)">{% trans "Log in to book" %}</a>
+      {% endif %}
+    </aside>
+  </div>
+</div></div>
+{% endblock %}
+
+{% block extra_js %}<script src="{% static 'js/booking.js' %}"></script>{% endblock %}

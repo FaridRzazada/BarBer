@@ -1,0 +1,61 @@
+{% extends "dashboard/base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Working hours" %} — {{ SITE_NAME }}{% endblock %}
+
+{% block dash %}
+<div class="dash-header"><div><h1>{% trans "Working hours" %}</h1><p>{% trans "Set your weekly schedule, breaks and days off." %}</p></div></div>
+
+<div class="grid" style="grid-template-columns: 1.5fr 1fr; align-items:start; gap:var(--space-5)">
+  <div class="panel" style="padding:var(--space-5)">
+    <h3>{% trans "Weekly hours" %}</h3>
+    <form method="post" class="form">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="hours">
+      {% for value, label, wh in week %}
+        <div class="hours-row">
+          <span class="hours-row__day">{{ label }}</span>
+          <label class="form__check" style="margin:0">
+            <input type="checkbox" class="form__check-input" name="open_{{ value }}" {% if wh.is_open %}checked{% endif %}>
+            <span>{% trans "Open" %}</span>
+          </label>
+          <input type="time" class="form__control time-input" name="start_{{ value }}" value="{% if wh.start_time %}{{ wh.start_time|time:'H:i' }}{% endif %}">
+          <input type="time" class="form__control time-input" name="end_{{ value }}" value="{% if wh.end_time %}{{ wh.end_time|time:'H:i' }}{% endif %}">
+        </div>
+      {% endfor %}
+      <button class="btn btn--primary" type="submit" style="margin-top:var(--space-4)">{% trans "Save hours" %}</button>
+    </form>
+  </div>
+
+  <div class="stack">
+    <div class="panel" style="padding:var(--space-5)">
+      <h3>{% trans "Breaks" %}</h3>
+      {% for b in breaks %}
+        <div class="field-inline" style="justify-content:space-between">
+          <span>{{ b.get_weekday_display }} · {{ b.start_time|time:"H:i" }}–{{ b.end_time|time:"H:i" }}</span>
+          <form method="post">{% csrf_token %}<input type="hidden" name="action" value="delete_break"><input type="hidden" name="break_id" value="{{ b.pk }}"><button class="btn btn--sm btn--danger">{% trans "Remove" %}</button></form>
+        </div>
+      {% empty %}<p class="muted">{% trans "No breaks set." %}</p>{% endfor %}
+      <form method="post" class="form" style="margin-top:var(--space-3)">
+        {% csrf_token %}<input type="hidden" name="action" value="add_break">
+        {% for field in break_form %}{% include "includes/form_field.html" with field=field %}{% endfor %}
+        <button class="btn btn--ghost btn--sm">{% trans "Add break" %}</button>
+      </form>
+    </div>
+
+    <div class="panel" style="padding:var(--space-5)">
+      <h3>{% trans "Days off" %}</h3>
+      {% for d in days_off %}
+        <div class="field-inline" style="justify-content:space-between">
+          <span>{{ d.date }} {% if d.reason %}<span class="muted">· {{ d.reason }}</span>{% endif %}</span>
+          <form method="post">{% csrf_token %}<input type="hidden" name="action" value="delete_dayoff"><input type="hidden" name="dayoff_id" value="{{ d.pk }}"><button class="btn btn--sm btn--danger">{% trans "Remove" %}</button></form>
+        </div>
+      {% empty %}<p class="muted">{% trans "No days off scheduled." %}</p>{% endfor %}
+      <form method="post" class="form" style="margin-top:var(--space-3)">
+        {% csrf_token %}<input type="hidden" name="action" value="add_dayoff">
+        {% for field in dayoff_form %}{% include "includes/form_field.html" with field=field %}{% endfor %}
+        <button class="btn btn--ghost btn--sm">{% trans "Add day off" %}</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

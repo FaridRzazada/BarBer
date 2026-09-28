@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Favorites" %} — {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="page"><div class="container">
+  <div class="section__head"><h1 class="section__title">{% trans "Your favorites" %}</h1></div>
+  {% if professionals %}
+    <div class="grid grid--cards">
+      {% for professional in professionals %}{% include "includes/professional_card.html" %}{% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <h3>{% trans "No favorites yet" %}</h3>
+      <p>{% trans "Tap the heart on any barber or salon to save them here." %}</p>
+      <a class="btn btn--primary" href="{% url 'core:find' %}">{% trans "Find professionals" %}</a>
+    </div>
+  {% endif %}
+</div></div>
+{% endblock %}

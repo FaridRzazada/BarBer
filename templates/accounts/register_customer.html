@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Sign up" %} — {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container auth-shell">
+  <div class="auth-card">
+    <h1>{% trans "Create your account" %}</h1>
+    <p class="muted">{% trans "Book barbers and salons in a few clicks." %}</p>
+
+    {% if form.non_field_errors %}<div class="formset-errors">{{ form.non_field_errors }}</div>{% endif %}
+
+    <form method="post" class="form" novalidate>
+      {% csrf_token %}
+      <div class="form__grid">
+        {% include "includes/form_field.html" with field=form.first_name %}
+        {% include "includes/form_field.html" with field=form.last_name %}
+      </div>
+      {% include "includes/form_field.html" with field=form.email %}
+      <div class="form__grid">
+        {% include "includes/form_field.html" with field=form.phone %}
+        {% include "includes/form_field.html" with field=form.city %}
+      </div>
+      <div class="form__grid">
+        {% include "includes/form_field.html" with field=form.password1 %}
+        {% include "includes/form_field.html" with field=form.password2 %}
+      </div>
+      <button class="btn btn--primary btn--block btn--lg" type="submit">{% trans "Create account" %}</button>
+    </form>
+  </div>
+  <p class="auth-alt">{% trans "Want to offer services instead?" %} <a href="{% url 'accounts:register_professional' %}">{% trans "Register as a professional" %}</a></p>
+</div>
+{% endblock %}

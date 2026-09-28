@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "My bookings" %} — {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="page"><div class="container">
+  <div class="section__head"><h1 class="section__title">{% trans "My bookings" %}</h1></div>
+
+  <div data-tabs>
+    <div class="tabs">
+      <button class="tab is-active" data-tab="upcoming">{% trans "Upcoming" %} ({{ upcoming|length }})</button>
+      <button class="tab" data-tab="completed">{% trans "Completed" %} ({{ completed|length }})</button>
+      <button class="tab" data-tab="cancelled">{% trans "Cancelled" %} ({{ cancelled|length }})</button>
+      <button class="tab" data-tab="no_show">{% trans "No-show" %} ({{ no_show|length }})</button>
+    </div>
+
+    <div data-panel="upcoming">{% include "bookings/_booking_rows.html" with items=upcoming empty_msg="No upcoming appointments." %}</div>
+    <div data-panel="completed" hidden>{% include "bookings/_booking_rows.html" with items=completed empty_msg="No completed appointments yet." %}</div>
+    <div data-panel="cancelled" hidden>{% include "bookings/_booking_rows.html" with items=cancelled empty_msg="No cancelled bookings." %}</div>
+    <div data-panel="no_show" hidden>{% include "bookings/_booking_rows.html" with items=no_show empty_msg="Nothing here." %}</div>
+  </div>
+</div></div>
+{% endblock %}

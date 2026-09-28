@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Page not found" %} — {{ SITE_NAME }}{% endblock %}
+{% block content %}
+<div class="page"><div class="container text-center" style="max-width:520px">
+  <p class="eyebrow">404</p>
+  <h1>{% trans "We can't find that page" %}</h1>
+  <p class="muted">{% trans "The page you're looking for may have moved or no longer exists." %}</p>
+  <a class="btn btn--primary" href="{% url 'core:home' %}">{% trans "Back to home" %}</a>
+</div></div>
+{% endblock %}

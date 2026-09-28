@@ -1,0 +1,44 @@
+{% extends "dashboard/base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Reviews" %} — {{ SITE_NAME }}{% endblock %}
+
+{% block dash %}
+<div class="dash-header"><div><h1>{% trans "Reviews" %}</h1><p>{% trans "What your customers are saying." %}</p></div></div>
+
+{% if summary.count %}
+<div class="panel" style="padding:var(--space-5); margin-bottom:var(--space-5)">
+  <div class="rating-summary">
+    <div>
+      <div class="rating-summary__score">{{ summary.average }}</div>
+      <div class="stars"><span class="stars__fill" style="width:{% widthratio summary.average 5 100 %}%"></span></div>
+      <div class="muted">{{ summary.count }} {% trans "reviews" %}</div>
+    </div>
+    <div class="rating-bars">
+      {% for star, count in summary.distribution.items %}
+        <div class="rating-bar"><span>{{ star }}★</span>
+          <div class="rating-bar__track"><div class="rating-bar__fill" style="width: {% widthratio count summary.count 100 %}%"></div></div>
+          <span>{{ count }}</span></div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% if reviews %}
+  <div class="panel" style="padding:var(--space-5)">
+    {% for r in reviews %}
+      <div class="review">
+        <div class="review__head">
+          <span class="avatar">{{ r.customer.display_name|first|upper }}</span>
+          <div><div class="review__name">{{ r.customer.display_name }}</div>
+            <div class="stars" style="font-size:0.85rem"><span class="stars__fill" style="width:{% widthratio r.rating 5 100 %}%"></span></div></div>
+          <span class="review__date">{{ r.created_at|date:"j M Y" }}</span>
+        </div>
+        {% if r.comment %}<p class="review__body">{{ r.comment }}</p>{% endif %}
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="empty-state"><h3>{% trans "No reviews yet" %}</h3><p>{% trans "Reviews appear after customers complete appointments." %}</p></div>
+{% endif %}
+{% endblock %}

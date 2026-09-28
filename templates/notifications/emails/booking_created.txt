@@ -1,0 +1,13 @@
+New appointment request
+
+Customer: {{ customer.display_name }}
+Service:  {{ service.name }}
+Date:     {{ booking.date }}
+Time:     {{ booking.start_time|time:"H:i" }}–{{ booking.end_time|time:"H:i" }}
+{% if booking.barber %}Barber:   {{ booking.barber.professional.display_name }}
+{% endif %}Phone:    {{ customer.phone|default:"—" }}
+
+Manage this request in your dashboard:
+{{ booking_url }}
+
+— {{ SITE_NAME }}

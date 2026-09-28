@@ -1,0 +1,7 @@
+{% extends "dashboard/base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Dashboard" %} — {{ SITE_NAME }}{% endblock %}
+{% block dash %}
+<div class="dash-header"><div><h1>{% trans "Staff" %}</h1><p>{% trans "You're signed in as an administrator." %}</p></div></div>
+<div class="card"><p>{% trans "Manage the platform from the Django admin." %}</p><a class="btn btn--primary" href="/admin/">{% trans "Open admin" %}</a></div>
+{% endblock %}

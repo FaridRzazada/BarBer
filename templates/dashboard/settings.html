@@ -1,0 +1,36 @@
+{% extends "dashboard/base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Settings" %} — {{ SITE_NAME }}{% endblock %}
+
+{% block dash %}
+<div class="dash-header"><div><h1>{% trans "Settings" %}</h1><p>{% trans "Manage your account details." %}</p></div></div>
+
+<div class="panel" style="padding:var(--space-5); max-width:720px">
+  <form method="post" enctype="multipart/form-data" class="form">
+    {% csrf_token %}
+    <h3>{% trans "Account" %}</h3>
+    <div class="form__grid">
+      {% include "includes/form_field.html" with field=account_form.first_name %}
+      {% include "includes/form_field.html" with field=account_form.last_name %}
+    </div>
+    <div class="form__grid">
+      {% include "includes/form_field.html" with field=account_form.phone %}
+      {% include "includes/form_field.html" with field=account_form.city %}
+    </div>
+    <div class="form__grid">
+      {% include "includes/form_field.html" with field=account_form.date_of_birth %}
+      {% include "includes/form_field.html" with field=account_form.gender %}
+    </div>
+    {% include "includes/form_field.html" with field=account_form.avatar %}
+
+    {% if customer_form %}
+      <h3 style="margin-top:var(--space-4)">{% trans "Preferences" %}</h3>
+      {% for field in customer_form %}{% include "includes/form_field.html" with field=field %}{% endfor %}
+    {% endif %}
+
+    <button class="btn btn--primary btn--lg" type="submit">{% trans "Save settings" %}</button>
+  </form>
+  <hr>
+  <p><a href="{% url 'accounts:password_reset' %}">{% trans "Change your password" %}</a></p>
+</div>
+{% endblock %}

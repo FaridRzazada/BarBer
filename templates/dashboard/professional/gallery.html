@@ -1,0 +1,35 @@
+{% extends "dashboard/base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Gallery" %} — {{ SITE_NAME }}{% endblock %}
+
+{% block dash %}
+<div class="dash-header"><div><h1>{% trans "Gallery" %}</h1><p>{% trans "Photos of your space — interior, work area, team." %}</p></div></div>
+
+<div class="grid" style="grid-template-columns: 1.4fr 1fr; align-items:start; gap:var(--space-5)">
+  <div>
+    {% if images %}
+      <div class="media-grid">
+        {% for img in images %}
+          <figure>
+            <img src="{{ img.image.url }}" alt="{{ img.title }}" loading="lazy">
+            {% if img.title %}<figcaption class="media-grid__caption">{{ img.title }}</figcaption>{% endif %}
+            <form method="post" action="{% url 'dashboard:gallery_delete' img.pk %}" class="media-grid__del" data-confirm="{% trans 'Remove this photo?' %}">
+              {% csrf_token %}<button class="btn btn--sm btn--danger">×</button>
+            </form>
+          </figure>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state"><h3>{% trans "No photos yet" %}</h3><p>{% trans "Add photos of your space." %}</p></div>
+    {% endif %}
+  </div>
+  <div class="panel" style="padding:var(--space-5)">
+    <h3>{% trans "Add a photo" %}</h3>
+    <form method="post" enctype="multipart/form-data" class="form">
+      {% csrf_token %}
+      {% for field in form %}{% include "includes/form_field.html" with field=field %}{% endfor %}
+      <button class="btn btn--primary btn--block">{% trans "Upload" %}</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

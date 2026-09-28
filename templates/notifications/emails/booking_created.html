@@ -1,0 +1,15 @@
+<div style="font-family:Inter,Arial,sans-serif;max-width:520px;margin:0 auto;color:#201c18">
+  <h2 style="color:#17130f">New appointment request</h2>
+  <table style="width:100%;border-collapse:collapse;font-size:15px">
+    <tr><td style="padding:6px 0;color:#6f665d">Customer</td><td style="text-align:right">{{ customer.display_name }}</td></tr>
+    <tr><td style="padding:6px 0;color:#6f665d">Service</td><td style="text-align:right">{{ service.name }}</td></tr>
+    <tr><td style="padding:6px 0;color:#6f665d">Date</td><td style="text-align:right">{{ booking.date }}</td></tr>
+    <tr><td style="padding:6px 0;color:#6f665d">Time</td><td style="text-align:right">{{ booking.start_time|time:"H:i" }}–{{ booking.end_time|time:"H:i" }}</td></tr>
+    {% if booking.barber %}<tr><td style="padding:6px 0;color:#6f665d">Barber</td><td style="text-align:right">{{ booking.barber.professional.display_name }}</td></tr>{% endif %}
+    <tr><td style="padding:6px 0;color:#6f665d">Phone</td><td style="text-align:right">{{ customer.phone|default:"—" }}</td></tr>
+  </table>
+  <p style="margin-top:20px">
+    <a href="{{ booking_url }}" style="display:inline-block;background:#23201d;color:#fff;padding:12px 20px;border-radius:8px;text-decoration:none">Open dashboard</a>
+  </p>
+  <p style="color:#6f665d;font-size:13px">— {{ SITE_NAME }}</p>
+</div>

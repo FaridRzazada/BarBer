@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+{% load static i18n l10n %}
+{% block title %}{{ professional.display_name }} — {{ professional.type_label }}{% if professional.city %} {% trans "in" %} {{ professional.city }}{% endif %} | {{ SITE_NAME }}{% endblock %}
+{% block meta_description %}{{ meta_description }}{% endblock %}
+{% block og_title %}{{ professional.display_name }}{% endblock %}
+{% block og_description %}{{ meta_description }}{% endblock %}
+{% if professional.has_location %}{% block head_extra %}<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">{% endblock %}{% endif %}
+
+{% block content %}
+<article class="page"><div class="container">
+  <nav class="breadcrumbs"><a href="{% url 'core:home' %}">{% trans "Home" %}</a> / <a href="{% url 'professionals:list' %}">{% trans "Professionals" %}</a> / {{ professional.display_name }}</nav>
+
+  <!-- Header -->
+  <header class="card--flush panel" style="overflow:hidden; margin-bottom:var(--space-6)">
+    <div style="height:200px; background:var(--color-surface-2)">
+      {% if professional.cover_image %}<img src="{{ professional.cover_image.url }}" alt="" style="width:100%;height:100%;object-fit:cover">{% endif %}
+    </div>
+    <div style="padding:var(--space-5); display:flex; gap:var(--space-5); align-items:flex-start; flex-wrap:wrap">
+      <span class="avatar avatar--xl" style="margin-top:-64px; border:4px solid var(--color-surface)">
+        {% if professional.profile_image %}<img src="{{ professional.profile_image.url }}" alt="{{ professional.display_name }}">{% else %}{{ professional.display_name|first|upper }}{% endif %}
+      </span>
+      <div style="flex:1; min-width:220px">
+        <h1 style="margin:0 0 4px; display:flex; align-items:center; gap:8px">{{ professional.display_name }}
+          {% if professional.is_verified %}<span class="badge badge--verified">✓ {% trans "Verified" %}</span>{% endif %}</h1>
+        <div class="cluster">
+          <span class="badge badge--type">{{ professional.type_label }}</span>
+          {% if rating.count %}<span class="rating-inline"><span class="stars"><span class="stars__fill" style="width:{% widthratio rating.average 5 100 %}%"></span></span> <strong>{{ rating.average }}</strong> ({{ rating.count }})</span>
+          {% else %}<span class="muted">{% trans "No reviews yet" %}</span>{% endif %}
+          {% if is_open %}<span class="badge badge--open"><span class="status-dot status-dot--open"></span>{% trans "Open now" %}</span>{% else %}<span class="badge badge--closed">{% trans "Closed" %}</span>{% endif %}
+          {% if professional.city %}<span class="muted">{{ professional.city }}</span>{% endif %}
+        </div>
+      </div>
+      <div class="cluster">
+        <button class="fav-btn {% if is_favorited %}is-active{% endif %}" data-fav="{{ professional.id }}"
+                data-auth="{% if user.is_authenticated %}1{% else %}0{% endif %}" data-login-url="{% url 'accounts:login' %}"
+                aria-label="{% trans 'Save' %}" aria-pressed="{% if is_favorited %}true{% else %}false{% endif %}">
+          <svg viewBox="0 0 24 24"><path d="M12 21s-7-4.5-9.5-9A5.3 5.3 0 0 1 12 6a5.3 5.3 0 0 1 9.5 6c-2.5 4.5-9.5 9-9.5 9z"/></svg>
+        </button>
+        {% if user.is_authenticated and user.is_customer %}
+          <a class="btn btn--ghost" href="{% url 'messaging:index' %}?professional={{ professional.id }}">{% trans "Message" %}</a>
+        {% endif %}
+        <a class="btn btn--primary btn--lg" href="{% url 'bookings:create' %}?professional={{ professional.id }}">{% trans "Book appointment" %}</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="grid" style="grid-template-columns: 1.6fr 1fr; align-items:start; gap:var(--space-6)">
+    <!-- Main column -->
+    <div class="stack" style="gap:var(--space-6)">
+      {% if professional.description %}
+        <section><h2>{% trans "About" %}</h2><p>{{ professional.description|linebreaks }}</p>
+          {% if professional.is_barber and professional.barber_profile.specialization %}
+            <p><strong>{% trans "Specialization:" %}</strong> {{ professional.barber_profile.specialization }}
+            {% if professional.barber_profile.experience_years %} · {{ professional.barber_profile.experience_years }} {% trans "years experience" %}{% endif %}</p>
+          {% endif %}
+        </section>
+      {% endif %}
+
+      {% if team %}
+        <section>
+          <h2>{% trans "Our team" %}</h2>
+          <div class="team-grid">
+            {% for m in team %}
+              <div class="team-card">
+                <span class="avatar avatar--lg">{% if m.barber.professional.profile_image %}<img src="{{ m.barber.professional.profile_image.url }}" alt="">{% else %}{{ m.barber.professional.display_name|first|upper }}{% endif %}</span>
+                <div class="team-card__name">{{ m.barber.professional.display_name }}</div>
+                <div class="team-card__role">{{ m.position|default:"Barber" }}</div>
+                <a class="btn btn--sm btn--primary" style="margin-top:var(--space-2)" href="{% url 'bookings:create' %}?professional={{ professional.id }}&barber={{ m.barber.id }}">{% trans "Book with" %} {{ m.barber.professional.display_name|truncatewords:1 }}</a>
+              </div>
+            {% endfor %}
+          </div>
+        </section>
+      {% endif %}
+
+      <section>
+        <h2>{% trans "Services" %}</h2>
+        {% if has_services %}
+          {% for category, items in services_by_category.items %}
+            <div class="service-cat">
+              <div class="service-cat__title">{{ category }}</div>
+              <div class="service-list">
+                {% for s in items %}
+                  <div class="service-item">
+                    <div><div class="service-item__name">{{ s.name }}</div>{% if s.description %}<div class="service-item__desc">{{ s.description }}</div>{% endif %}</div>
+                    <div class="service-item__meta">
+                      <span class="service-item__duration">{{ s.duration_minutes }} {% trans "min" %}</span>
+                      <span class="service-item__price">{% if s.show_price and s.price %}{{ s.price|floatformat:"-2" }} {{ DEFAULT_CURRENCY }}{% else %}{% trans "Price not specified" %}{% endif %}</span>
+                      <a class="btn btn--sm btn--primary" href="{% url 'bookings:create' %}?professional={{ professional.id }}&service={{ s.id }}">{% trans "Book" %}</a>
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}<div class="empty-state"><p>{% trans "No services listed yet." %}</p></div>{% endif %}
+      </section>
+
+      {% if portfolio_images %}
+        <section><h2>{% trans "Portfolio" %}</h2>
+          <div class="media-grid">{% for img in portfolio_images %}<figure><img src="{{ img.image.url }}" alt="{{ img.title }}" loading="lazy">{% if img.title %}<figcaption class="media-grid__caption">{{ img.title }}</figcaption>{% endif %}</figure>{% endfor %}</div>
+        </section>
+      {% endif %}
+
+      {% if gallery_images %}
+        <section><h2>{% trans "Gallery" %}</h2>
+          <div class="media-grid">{% for img in gallery_images %}<figure><img src="{{ img.image.url }}" alt="{{ img.title }}" loading="lazy">{% if img.title %}<figcaption class="media-grid__caption">{{ img.title }}</figcaption>{% endif %}</figure>{% endfor %}</div>
+        </section>
+      {% endif %}
+
+      {% if products %}
+        <section><h2>{% trans "Products" %}</h2>
+          <div class="grid grid--3">
+            {% for p in products %}
+              <a class="product-card" href="{{ p.get_absolute_url }}">
+                <div class="product-card__media">{% if p.main_image %}<img src="{{ p.main_image.url }}" alt="{{ p.name }}" loading="lazy">{% endif %}</div>
+                <div class="product-card__body">{% if p.brand %}<span class="product-card__brand">{{ p.brand }}</span>{% endif %}<span class="product-card__name">{{ p.name }}</span><span class="product-card__price">{% if p.price %}{{ p.price|floatformat:"-2" }} {{ p.currency }}{% else %}—{% endif %}</span></div>
+              </a>
+            {% endfor %}
+          </div>
+        </section>
+      {% endif %}
+
+      <section>
+        <h2>{% trans "Reviews" %}</h2>
+        {% if rating.count %}
+          <div class="rating-summary" style="margin-bottom:var(--space-4)">
+            <div><div class="rating-summary__score">{{ rating.average }}</div><div class="muted">{{ rating.count }} {% trans "reviews" %}</div></div>
+            <div class="rating-bars">
+              {% for star, count in rating.distribution.items %}
+                <div class="rating-bar"><span>{{ star }}★</span><div class="rating-bar__track"><div class="rating-bar__fill" style="width:{% widthratio count rating.count 100 %}%"></div></div><span>{{ count }}</span></div>
+              {% endfor %}
+            </div>
+          </div>
+          {% for r in reviews %}
+            <div class="review">
+              <div class="review__head"><span class="avatar">{{ r.customer.display_name|first|upper }}</span>
+                <div><div class="review__name">{{ r.customer.display_name }}</div><div class="stars" style="font-size:.85rem"><span class="stars__fill" style="width:{% widthratio r.rating 5 100 %}%"></span></div></div>
+                <span class="review__date">{{ r.created_at|date:"j M Y" }}</span></div>
+              {% if r.comment %}<p class="review__body">{{ r.comment }}</p>{% endif %}
+            </div>
+          {% endfor %}
+        {% else %}<div class="empty-state"><p>{% trans "No reviews yet. Be the first after your visit." %}</p></div>{% endif %}
+      </section>
+    </div>
+
+    <!-- Sidebar -->
+    <aside class="stack" style="gap:var(--space-5); position:sticky; top:calc(var(--header-height) + 16px)">
+      <div class="panel" style="padding:var(--space-5)">
+        <a class="btn btn--primary btn--block btn--lg" href="{% url 'bookings:create' %}?professional={{ professional.id }}">{% trans "Book appointment" %}</a>
+      </div>
+
+      <div class="panel" style="padding:var(--space-5)">
+        <h3>{% trans "Opening hours" %}</h3>
+        <table style="width:100%; font-size:0.92rem">
+          {% for label, wh in week_hours %}
+            <tr><td style="padding:4px 0; color:var(--color-muted)">{{ label }}</td>
+              <td style="text-align:right">{% if wh and wh.is_open and wh.start_time %}{{ wh.start_time|time:"H:i" }}–{{ wh.end_time|time:"H:i" }}{% else %}{% trans "Closed" %}{% endif %}</td></tr>
+          {% endfor %}
+        </table>
+      </div>
+
+      <div class="panel" style="padding:var(--space-5)">
+        <h3>{% trans "Contact" %}</h3>
+        {% if professional.address %}<p class="muted">{{ professional.address }}{% if professional.city %}, {{ professional.city }}{% endif %}</p>{% endif %}
+        {% if professional.phone %}<p>📞 <a href="tel:{{ professional.phone }}">{{ professional.phone }}</a></p>{% endif %}
+        {% if professional.public_email %}<p>✉ <a href="mailto:{{ professional.public_email }}">{{ professional.public_email }}</a></p>{% endif %}
+        {% if professional.website %}<p>🔗 <a href="{{ professional.website }}" rel="noopener" target="_blank">{% trans "Website" %}</a></p>{% endif %}
+        {% if professional.has_location %}<div id="detail-map" style="height:200px; border-radius:var(--radius-md); margin-top:var(--space-3)"></div>{% endif %}
+        {% if user.is_authenticated %}
+          <p style="margin-top:var(--space-3)"><a class="muted" href="{% url 'core:report' 'professional' professional.id %}" style="font-size:0.85rem">{% trans "Report this profile" %}</a></p>
+        {% endif %}
+      </div>
+    </aside>
+  </div>
+</div></article>
+{% endblock %}
+
+{% block extra_js %}
+{% if professional.has_location %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+  (function(){
+    var lat = {{ professional.latitude|unlocalize }}, lng = {{ professional.longitude|unlocalize }};
+    var m = L.map('detail-map', {scrollWheelZoom:false}).setView([lat,lng], 15);
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',{maxZoom:19, attribution:'Tiles &copy; Esri'}).addTo(m);
+    L.marker([lat,lng]).addTo(m);
+  })();
+</script>
+{% endif %}
+{% endblock %}

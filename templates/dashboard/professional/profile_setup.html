@@ -1,0 +1,64 @@
+{% extends "dashboard/base.html" %}
+{% load i18n static %}
+{% block title %}{% trans "Set up your profile" %} — {{ SITE_NAME }}{% endblock %}
+{% block head_extra %}<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">{% endblock %}
+
+{% block dash %}
+<div class="dash-header">
+  <div>
+    <h1>{% trans "Let's set up your profile" %}</h1>
+    <p>{% trans "Complete these steps so customers can find and book you." %}</p>
+  </div>
+  <a class="btn btn--ghost" href="{% url 'dashboard:index' %}">{% trans "Finish later" %}</a>
+</div>
+
+<div class="completion" style="margin-bottom:var(--space-6)">
+  <strong>{{ completion.percent }}% {% trans "complete" %} — {{ completion.done }}/{{ completion.total }} {% trans "steps" %}</strong>
+  <div class="completion__bar"><div class="completion__fill" style="width: {{ completion.percent }}%"></div></div>
+  <ul class="completion__list">
+    {% for s in completion.sections %}
+      <li class="{% if s.done %}done{% endif %}">
+        <span class="completion__check">{% if s.done %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg>{% endif %}</span>{{ s.label }}
+      </li>
+    {% endfor %}
+  </ul>
+</div>
+
+<form method="post" enctype="multipart/form-data" class="form">
+  {% csrf_token %}
+  <div class="panel" style="padding:var(--space-5); margin-bottom:var(--space-5)">
+    <p class="eyebrow">{% trans "Step 1 & 2 · Basics and location" %}</p>
+    {% include "includes/form_field.html" with field=profile_form.display_name %}
+    {% include "includes/form_field.html" with field=profile_form.description %}
+    <div class="form__grid">
+      {% include "includes/form_field.html" with field=profile_form.phone %}
+      {% include "includes/form_field.html" with field=profile_form.public_email %}
+    </div>
+    {% include "includes/form_field.html" with field=profile_form.address %}
+    {% include "includes/form_field.html" with field=profile_form.city %}
+    <p class="location-hint">{% trans "Click the map to drop your pin." %}
+      <button type="button" class="btn btn--ghost btn--sm" id="location-use-gps">{% trans "Use my location" %}</button></p>
+    <div id="location-picker" class="location-picker"></div>
+    <div class="form__grid" style="margin-top:var(--space-3)">
+      {% include "includes/form_field.html" with field=profile_form.latitude %}
+      {% include "includes/form_field.html" with field=profile_form.longitude %}
+    </div>
+    <div class="form__grid">
+      {% include "includes/form_field.html" with field=profile_form.profile_image %}
+      {% include "includes/form_field.html" with field=profile_form.cover_image %}
+    </div>
+    <button class="btn btn--primary" type="submit">{% trans "Save & continue" %}</button>
+  </div>
+</form>
+
+<div class="grid grid--3">
+  <a class="card" href="{% url 'dashboard:hours' %}"><h4>{% trans "Step 3 · Working hours" %}</h4><p class="muted">{% trans "Set when you're open and add breaks." %}</p></a>
+  <a class="card" href="{% url 'dashboard:services' %}"><h4>{% trans "Step 4 · Services" %}</h4><p class="muted">{% trans "Add the services you offer." %}</p></a>
+  <a class="card" href="{% url 'dashboard:portfolio' %}"><h4>{% trans "Step 5 · Photos" %}</h4><p class="muted">{% trans "Upload portfolio & gallery photos." %}</p></a>
+</div>
+{% endblock %}
+
+{% block extra_js %}{{ block.super }}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="{% static 'js/profile.js' %}"></script>
+{% endblock %}

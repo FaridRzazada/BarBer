@@ -1,0 +1,21 @@
+{% load i18n %}
+{% if items %}
+  <div class="stack" style="margin-top:var(--space-4)">
+    {% for b in items %}
+      <div class="card" style="display:flex;justify-content:space-between;align-items:center;gap:var(--space-4);flex-wrap:wrap">
+        <div>
+          <strong>{{ b.service.name }}</strong> — {{ b.professional.display_name }}<br>
+          <span class="muted">{{ b.date|date:"j M Y" }} · {{ b.start_time|time:"H:i" }}–{{ b.end_time|time:"H:i" }}
+          {% if b.service.show_price and b.service.price %} · {{ b.service.price|floatformat:"-2" }} {{ DEFAULT_CURRENCY }}{% endif %}</span>
+        </div>
+        <div class="cluster">
+          <span class="status status--{{ b.status }}">{{ b.get_status_display }}</span>
+          <a class="btn btn--sm" href="{% url 'bookings:detail' b.pk %}">{% trans "Details" %}</a>
+          <a class="btn btn--sm btn--ghost" href="{% url 'bookings:create' %}?professional={{ b.professional.id }}">{% trans "Book again" %}</a>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="empty-state" style="margin-top:var(--space-4)"><p>{{ empty_msg }}</p></div>
+{% endif %}

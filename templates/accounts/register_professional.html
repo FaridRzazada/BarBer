@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Register as a professional" %} — {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container auth-shell">
+  <div class="auth-card">
+    <h1>{% trans "Grow your business" %}</h1>
+    <p class="muted">{% trans "Set up your barber or salon profile and start taking bookings." %}</p>
+
+    {% if form.non_field_errors %}<div class="formset-errors">{{ form.non_field_errors }}</div>{% endif %}
+
+    <form method="post" class="form" novalidate>
+      {% csrf_token %}
+
+      <div class="form__row {% if form.professional_type.errors %}has-error{% endif %}">
+        <label class="form__label">{{ form.professional_type.label }}</label>
+        <div class="choice-cards">
+          {% for radio in form.professional_type %}
+            <label>{{ radio.tag }} <strong>{{ radio.choice_label }}</strong></label>
+          {% endfor %}
+        </div>
+        {% for e in form.professional_type.errors %}<div class="form__error">{{ e }}</div>{% endfor %}
+      </div>
+
+      {% include "includes/form_field.html" with field=form.display_name %}
+      <div class="form__grid">
+        {% include "includes/form_field.html" with field=form.first_name %}
+        {% include "includes/form_field.html" with field=form.last_name %}
+      </div>
+      <div class="form__grid">
+        {% include "includes/form_field.html" with field=form.email %}
+        {% include "includes/form_field.html" with field=form.phone %}
+      </div>
+      <div class="form__grid">
+        {% include "includes/form_field.html" with field=form.password1 %}
+        {% include "includes/form_field.html" with field=form.password2 %}
+      </div>
+      <button class="btn btn--primary btn--block btn--lg" type="submit">{% trans "Create professional account" %}</button>
+    </form>
+  </div>
+  <p class="auth-alt">{% trans "Looking to book instead?" %} <a href="{% url 'accounts:register_customer' %}">{% trans "Sign up as a customer" %}</a></p>
+</div>
+{% endblock %}

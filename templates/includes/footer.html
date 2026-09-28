@@ -1,0 +1,37 @@
+{% load i18n %}
+<footer class="footer">
+  <div class="container footer__grid">
+    <div class="footer__brand-col">
+      <div class="footer__brand">{{ SITE_NAME }}</div>
+      <p>{{ SITE_TAGLINE }} {% trans "Book barbers and salons near you in a few clicks." %}</p>
+    </div>
+    <div>
+      <h5>{% trans "Discover" %}</h5>
+      <ul>
+        <li><a href="{% url 'professionals:list' %}?type=barber">{% trans "Find a barber" %}</a></li>
+        <li><a href="{% url 'professionals:list' %}?type=salon">{% trans "Find a salon" %}</a></li>
+        <li><a href="{% url 'core:map' %}">{% trans "Map" %}</a></li>
+        <li><a href="{% url 'core:find' %}">{% trans "Explore nearby" %}</a></li>
+      </ul>
+    </div>
+    <div>
+      <h5>{% trans "For professionals" %}</h5>
+      <ul>
+        <li><a href="{% url 'accounts:register_professional' %}">{% trans "Become a barber" %}</a></li>
+        <li><a href="{% url 'accounts:register_professional' %}">{% trans "Register your salon" %}</a></li>
+        <li><a href="{% url 'accounts:login' %}">{% trans "Professional login" %}</a></li>
+      </ul>
+    </div>
+    <div>
+      <h5>{% trans "Company" %}</h5>
+      <ul>
+        <li><a href="{% url 'core:about' %}">{% trans "About" %}</a></li>
+        <li><a href="{% url 'core:contact' %}">{% trans "Contact" %}</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="container footer__bottom">
+    <span>&copy; {% now "Y" %} {{ SITE_NAME }}. {% trans "All rights reserved." %}</span>
+    <span>{% trans "Maps" %} &copy; OpenStreetMap</span>
+  </div>
+</footer>

@@ -1,0 +1,10 @@
+<div style="font-family:Inter,Arial,sans-serif;max-width:520px;margin:0 auto;color:#201c18">
+  <h2 style="color:#17130f">Appointment cancelled</h2>
+  <p>{% if by_customer %}{{ customer.display_name }} cancelled their appointment.{% else %}Your appointment with {{ professional.display_name }} was cancelled.{% endif %}</p>
+  <table style="width:100%;border-collapse:collapse;font-size:15px">
+    <tr><td style="padding:6px 0;color:#6f665d">Service</td><td style="text-align:right">{{ service.name }}</td></tr>
+    <tr><td style="padding:6px 0;color:#6f665d">Date</td><td style="text-align:right">{{ booking.date }}</td></tr>
+    <tr><td style="padding:6px 0;color:#6f665d">Time</td><td style="text-align:right">{{ booking.start_time|time:"H:i" }}–{{ booking.end_time|time:"H:i" }}</td></tr>
+  </table>
+  <p style="color:#6f665d;font-size:13px">— {{ SITE_NAME }}</p>
+</div>

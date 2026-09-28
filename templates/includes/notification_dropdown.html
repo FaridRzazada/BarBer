@@ -1,0 +1,23 @@
+{% load i18n %}
+<div class="notif-dropdown" id="notif-dropdown">
+  <div class="notif-dropdown__head">
+    <strong>{% trans "Notifications" %}</strong>
+    <button class="btn btn--ghost btn--sm" id="notif-mark-all" type="button">{% trans "Mark all read" %}</button>
+  </div>
+  <div class="notif-dropdown__body">
+    {% for n in recent_notifications %}
+      <div class="notif-dropdown__item {% if not n.is_read %}is-unread{% endif %}"
+           data-notif-id="{{ n.id }}" data-notif-url="{{ n.url|default:'#' }}">
+        <div>
+          <div class="notif__title">{{ n.title }}</div>
+          <div class="notif__msg">{{ n.message|truncatechars:70 }}</div>
+        </div>
+      </div>
+    {% empty %}
+      <div class="toast-empty" style="padding:1rem">{% trans "You're all caught up." %}</div>
+    {% endfor %}
+  </div>
+  <div class="notif-dropdown__foot">
+    <a href="{% url 'notifications:index' %}">{% trans "See all notifications" %}</a>
+  </div>
+</div>

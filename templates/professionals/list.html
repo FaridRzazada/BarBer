@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Barbers & salons" %} — {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="page"><div class="container">
+  <div class="section__head">
+    <div>
+      <h1 class="section__title">{% trans "Barbers & salons" %}</h1>
+      <p>{% trans "Browse professionals or" %} <a href="{% url 'core:find' %}">{% trans "search the map" %}</a>.</p>
+    </div>
+  </div>
+
+  <form method="get" class="searchbar" style="margin-bottom:var(--space-5)">
+    <div class="searchbar__field">
+      <label>{% trans "Search" %}</label>
+      <input type="text" name="q" value="{{ current_query }}" placeholder="{% trans 'Name or service' %}">
+    </div>
+    <div class="searchbar__field">
+      <label>{% trans "City" %}</label>
+      <input type="text" name="city" value="{{ current_city }}" placeholder="{% trans 'Any city' %}">
+    </div>
+    <div class="searchbar__actions">
+      <select name="type" class="form__control">
+        <option value="all" {% if current_type == 'all' %}selected{% endif %}>{% trans "All" %}</option>
+        <option value="barber" {% if current_type == 'barber' %}selected{% endif %}>{% trans "Barbers" %}</option>
+        <option value="salon" {% if current_type == 'salon' %}selected{% endif %}>{% trans "Salons" %}</option>
+      </select>
+      <button class="btn btn--primary" type="submit">{% trans "Search" %}</button>
+    </div>
+  </form>
+
+  {% if professionals %}
+    <div class="grid grid--cards">
+      {% for professional in professionals %}{% include "includes/professional_card.html" %}{% endfor %}
+    </div>
+    {% include "includes/pagination.html" %}
+  {% else %}
+    <div class="empty-state">
+      <h3>{% trans "No professionals found" %}</h3>
+      <p>{% trans "Try changing your filters." %}</p>
+    </div>
+  {% endif %}
+</div></div>
+{% endblock %}

@@ -1,0 +1,13 @@
+Your appointment is confirmed
+
+{{ professional.display_name }} confirmed your appointment.
+
+Service: {{ service.name }}
+Date:    {{ booking.date }}
+Time:    {{ booking.start_time|time:"H:i" }}–{{ booking.end_time|time:"H:i" }}
+
+View your booking:
+{{ booking_url }}
+
+See you soon!
+— {{ SITE_NAME }}

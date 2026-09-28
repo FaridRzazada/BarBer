@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Report" %} — {{ SITE_NAME }}{% endblock %}
+{% block content %}
+<div class="page"><div class="container auth-shell">
+  <div class="auth-card">
+    <h1>{% trans "Report content" %}</h1>
+    <p class="muted">{% trans "Tell us what's wrong and our team will review it." %}</p>
+    <form method="post" class="form" novalidate>
+      {% csrf_token %}
+      {% for field in form %}{% include "includes/form_field.html" with field=field %}{% endfor %}
+      <button class="btn btn--primary btn--lg" type="submit">{% trans "Submit report" %}</button>
+    </form>
+  </div>
+</div></div>
+{% endblock %}

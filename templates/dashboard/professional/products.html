@@ -1,0 +1,40 @@
+{% extends "dashboard/base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Products" %} — {{ SITE_NAME }}{% endblock %}
+
+{% block dash %}
+<div class="dash-header"><div><h1>{% trans "Products" %}</h1><p>{% trans "Your product catalogue (display only — no online checkout)." %}</p></div></div>
+
+<div class="grid" style="grid-template-columns: 1.4fr 1fr; align-items:start; gap:var(--space-5)">
+  <div>
+    {% if products %}
+      <div class="grid grid--3">
+        {% for p in products %}
+          <div class="product-card">
+            <div class="product-card__media">{% if p.main_image %}<img src="{{ p.main_image.url }}" alt="{{ p.name }}" loading="lazy">{% endif %}</div>
+            <div class="product-card__body">
+              {% if p.brand %}<span class="product-card__brand">{{ p.brand }}</span>{% endif %}
+              <span class="product-card__name">{{ p.name }}</span>
+              <span class="product-card__price">{% if p.price %}{{ p.price|floatformat:"-2" }} {{ p.currency }}{% else %}—{% endif %}</span>
+              <div class="cluster" style="margin-top:var(--space-2)">
+                <a class="btn btn--sm btn--ghost" href="{% url 'dashboard:product_edit' p.pk %}">{% trans "Edit" %}</a>
+                <form method="post" action="{% url 'dashboard:product_delete' p.pk %}" data-confirm="{% trans 'Delete product?' %}">{% csrf_token %}<button class="btn btn--sm btn--danger">{% trans "Delete" %}</button></form>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state"><h3>{% trans "No products yet" %}</h3><p>{% trans "Add products your salon sells." %}</p></div>
+    {% endif %}
+  </div>
+  <div class="panel" style="padding:var(--space-5)">
+    <h3>{% trans "Add a product" %}</h3>
+    <form method="post" enctype="multipart/form-data" class="form">
+      {% csrf_token %}
+      {% for field in form %}{% include "includes/form_field.html" with field=field %}{% endfor %}
+      <button class="btn btn--primary btn--block">{% trans "Add product" %}</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,53 @@
+{% extends "dashboard/base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Appointments" %} — {{ SITE_NAME }}{% endblock %}
+
+{% block dash %}
+<div class="dash-header"><div><h1>{% trans "Appointments" %}</h1><p>{% trans "Confirm, complete or cancel bookings." %}</p></div></div>
+
+<div class="pill-group" style="margin-bottom:var(--space-4)">
+  <a href="{% url 'dashboard:appointments' %}" class="{% if not current_status %}is-active{% endif %}">{% trans "All" %}</a>
+  {% for value, label in statuses %}
+    <a href="?status={{ value }}" class="{% if current_status == value %}is-active{% endif %}">{{ label }}</a>
+  {% endfor %}
+</div>
+
+{% if bookings %}
+<div class="table-wrap">
+  <table class="data">
+    <thead><tr>
+      <th>{% trans "Customer" %}</th><th>{% trans "Service" %}</th><th>{% trans "When" %}</th>
+      <th>{% trans "Barber" %}</th><th>{% trans "Status" %}</th><th>{% trans "Actions" %}</th>
+    </tr></thead>
+    <tbody>
+      {% for b in bookings %}
+      <tr>
+        <td>{{ b.customer.display_name }}<br><small class="muted">{{ b.customer.phone }}</small></td>
+        <td>{{ b.service.name }}</td>
+        <td>{{ b.date }}<br><small class="muted">{{ b.start_time|time:"H:i" }}–{{ b.end_time|time:"H:i" }}</small></td>
+        <td>{% if b.barber %}{{ b.barber.professional.display_name }}{% else %}—{% endif %}</td>
+        <td><span class="status status--{{ b.status }}">{{ b.get_status_display }}</span></td>
+        <td class="actions">
+          <form method="post" class="cluster">
+            {% csrf_token %}
+            <input type="hidden" name="booking" value="{{ b.pk }}">
+            {% if b.status == 'pending' %}
+              <button class="btn btn--sm btn--primary" name="action" value="confirm">{% trans "Confirm" %}</button>
+            {% endif %}
+            {% if b.status == 'pending' or b.status == 'confirmed' %}
+              <button class="btn btn--sm" name="action" value="complete">{% trans "Complete" %}</button>
+              <button class="btn btn--sm" name="action" value="no_show">{% trans "No-show" %}</button>
+              <button class="btn btn--sm btn--danger" name="action" value="cancel">{% trans "Cancel" %}</button>
+            {% endif %}
+            <a class="btn btn--sm btn--ghost" href="{% url 'bookings:detail' b.pk %}">{% trans "View" %}</a>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+  <div class="empty-state"><h3>{% trans "No appointments" %}</h3><p>{% trans "Bookings will appear here as customers request them." %}</p></div>
+{% endif %}
+{% endblock %}

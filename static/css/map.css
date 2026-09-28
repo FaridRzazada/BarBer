@@ -1,0 +1,86 @@
+/* ==========================================================================
+   Map & Find page — split layout, markers, popups
+   ========================================================================== */
+
+.find-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr 1fr;
+  gap: 0;
+  height: calc(100vh - var(--header-height));
+}
+.find-filters {
+  border-right: 1px solid var(--color-border);
+  padding: var(--space-5);
+  overflow-y: auto;
+  background: var(--color-surface);
+}
+.find-results {
+  overflow-y: auto;
+  padding: var(--space-4);
+  background: var(--color-bg);
+}
+.find-map { position: relative; }
+#map, .map { width: 100%; height: 100%; min-height: 320px; background: var(--color-surface-2); z-index: 1; }
+
+.find-toolbar {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--space-3);
+  padding: 0 var(--space-2) var(--space-3);
+  flex-wrap: wrap;
+}
+.find-count { color: var(--color-muted); font-size: 0.9rem; }
+.find-results__list { display: grid; gap: var(--space-4); grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+
+.filter-group { margin-bottom: var(--space-5); }
+.filter-group__title { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--color-muted); margin-bottom: var(--space-2); }
+
+.mobile-view-toggle { display: none; }
+
+/* Leaflet marker + popup styling */
+.leaflet-popup-content-wrapper { border-radius: var(--radius-md); box-shadow: var(--shadow-md); }
+.leaflet-popup-content { margin: var(--space-3) var(--space-4); font-family: var(--font-sans); }
+.map-popup__name { font-weight: 700; color: var(--color-heading); margin-bottom: 2px; }
+.map-popup__meta { color: var(--color-muted); font-size: 0.84rem; margin-bottom: var(--space-2); }
+.map-popup__link { font-weight: 600; }
+
+.pin {
+  background: var(--color-primary); color: #fff;
+  border-radius: 50% 50% 50% 0; width: 30px; height: 30px;
+  transform: rotate(-45deg); display: grid; place-items: center;
+  box-shadow: var(--shadow-sm); border: 2px solid #fff;
+}
+.pin svg { transform: rotate(45deg); width: 15px; height: 15px; }
+.pin--salon { background: var(--color-accent); }
+
+.map-geo-btn {
+  position: absolute; z-index: 20; top: var(--space-3); right: var(--space-3);
+  background: var(--color-surface); border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm); padding: var(--space-2) var(--space-3);
+  box-shadow: var(--shadow-sm); font-weight: 600; font-size: 0.88rem; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.map-geo-btn svg { width: 16px; height: 16px; }
+
+/* Location picker (dashboard profile) */
+.location-picker { height: 320px; border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--color-border); }
+.location-hint { font-size: 0.85rem; color: var(--color-muted); margin-top: var(--space-2); }
+
+@media (max-width: 992px) {
+  .find-layout { grid-template-columns: 300px 1fr; }
+  .find-results { display: none; } /* results shown within filters column on tablet via toggle if needed */
+}
+
+@media (max-width: 768px) {
+  .find-layout {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+  .find-filters { border-right: none; border-bottom: 1px solid var(--color-border); }
+  .find-results { display: block; }
+  .find-map { height: 60vh; }
+  .mobile-view-toggle { display: inline-flex; }
+  /* toggled via .show-map / .show-list on the layout */
+  .find-layout.show-map .find-results { display: none; }
+  .find-layout.show-map .find-map { display: block; }
+  .find-layout.show-list .find-map { display: none; }
+  .find-layout.show-list .find-results { display: block; }
+}

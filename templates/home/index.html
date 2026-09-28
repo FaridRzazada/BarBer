@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% load static i18n %}
+
+{% block title %}{{ SITE_NAME }} — {% trans "Find your next haircut nearby" %}{% endblock %}
+
+{% block head_extra %}
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <div class="container hero__inner">
+    <p class="eyebrow">{{ SITE_NAME }}</p>
+    <h1>{% trans "Find your next haircut nearby." %}</h1>
+    <p class="hero__sub">{% trans "Book your barber or salon in a few clicks." %}</p>
+
+    <form class="searchbar" method="get" action="{% url 'core:find' %}" data-hero-search>
+      <div class="searchbar__field">
+        <label for="hero-q">{% trans "What are you looking for?" %}</label>
+        <input id="hero-q" name="q" type="text" placeholder="{% trans 'Barber, fade, beard, salon…' %}">
+      </div>
+      <div class="searchbar__field">
+        <label for="hero-city">{% trans "Location" %}</label>
+        <input id="hero-city" name="city" type="text" list="cities-list" placeholder="{% trans 'City or area' %}">
+        <datalist id="cities-list">
+          {% for c in cities %}<option value="{{ c.name }}">{% endfor %}
+        </datalist>
+      </div>
+      <div class="searchbar__actions">
+        <button class="btn btn--primary" type="submit">{% trans "Find" %}</button>
+        <button class="btn btn--ghost" type="button" data-use-location>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
+          {% trans "Use my location" %}
+        </button>
+      </div>
+    </form>
+    <p class="hero__hints">{% trans "Popular:" %}
+      {% for c in popular_services|slice:":4" %}<a href="{% url 'core:find' %}?service={{ c.slug }}">{{ c.name }}</a>{% if not forloop.last %} · {% endif %}{% endfor %}
+    </p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section__head">
+      <div>
+        <h2 class="section__title">{% trans "Nearby professionals" %}</h2>
+        <p>{% trans "Barbers and salons close to you." %}</p>
+      </div>
+      <a class="btn btn--ghost btn--sm" href="{% url 'core:find' %}">{% trans "Open the map" %} →</a>
+    </div>
+
+    <div class="grid" style="grid-template-columns: 1fr; gap: var(--space-5);">
+      <div class="map" id="home-map" style="height: 340px; border-radius: var(--radius-lg); border:1px solid var(--color-border);"></div>
+      <div class="grid grid--cards" id="home-nearby">
+        {% for professional in recent_professionals %}
+          {% include "includes/professional_card.html" %}
+        {% empty %}
+          <div class="empty-state" style="grid-column:1/-1">
+            <h3>{% trans "No professionals yet" %}</h3>
+            <p>{% trans "Be the first — register your barber shop or salon." %}</p>
+            <a class="btn btn--primary" href="{% url 'accounts:register_professional' %}">{% trans "Get started" %}</a>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% if popular_services %}
+<section class="section section--alt">
+  <div class="container">
+    <div class="section__head"><h2 class="section__title">{% trans "Popular services" %}</h2></div>
+    <div class="category-row">
+      {% for c in popular_services %}
+        <a class="category-tile" href="{% url 'core:find' %}?service={{ c.slug }}">
+          <span>{{ c.name }}</span>
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{% if featured_salons %}
+<section class="section">
+  <div class="container">
+    <div class="section__head">
+      <h2 class="section__title">{% trans "Featured salons" %}</h2>
+      <a class="btn btn--ghost btn--sm" href="{% url 'professionals:list' %}?type=salon">{% trans "All salons" %} →</a>
+    </div>
+    <div class="grid grid--cards">
+      {% for professional in featured_salons %}{% include "includes/professional_card.html" %}{% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<section class="section section--alt">
+  <div class="container">
+    <div class="section__head"><h2 class="section__title">{% trans "How it works" %}</h2></div>
+    <div class="steps">
+      <div class="step"><div class="step__num"></div><h3>{% trans "Find" %}</h3><p>{% trans "Search barbers and salons near you, filter by service and rating." %}</p></div>
+      <div class="step"><div class="step__num"></div><h3>{% trans "Choose" %}</h3><p>{% trans "Browse profiles, portfolios and reviews, then pick your professional." %}</p></div>
+      <div class="step"><div class="step__num"></div><h3>{% trans "Book" %}</h3><p>{% trans "Pick a service and an available time. Done in a few clicks." %}</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container cta-split">
+    <div class="cta-card">
+      <h3>{% trans "Become a barber" %}</h3>
+      <p>{% trans "Create your profile, showcase your work and take bookings online." %}</p>
+      <a class="btn btn--primary" href="{% url 'accounts:register_professional' %}">{% trans "Join as a barber" %}</a>
+    </div>
+    <div class="cta-card cta-card--dark">
+      <h3>{% trans "Register your salon" %}</h3>
+      <p>{% trans "Manage your team, services and appointments in one place." %}</p>
+      <a class="btn btn--accent" href="{% url 'accounts:register_professional' %}">{% trans "Register a salon" %}</a>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+  <script src="{% static 'js/map.js' %}"></script>
+  <script src="{% static 'js/search.js' %}"></script>
+{% endblock %}

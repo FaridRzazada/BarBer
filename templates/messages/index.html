@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load static i18n %}
+{% block title %}{% trans "Messages" %} — {{ SITE_NAME }}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<div class="page"><div class="container">
+  <h1>{% trans "Messages" %}</h1>
+  <div class="chat" data-messaging data-initial="{{ initial_conversation }}"
+       data-professional="{{ request.GET.professional|default:'' }}">
+    <div class="chat__list" id="conv-list">
+      <div class="toast-empty" style="padding:1rem">{% trans "Loading…" %}</div>
+    </div>
+    <div class="chat__thread" id="chat-thread">
+      <div class="chat__head" style="display:none"></div>
+      <div class="chat__messages" id="chat-messages">
+        <div class="chat__empty" id="chat-empty">{% trans "Select a conversation, or send a message to start a new one." %}</div>
+      </div>
+      <form class="chat__composer" id="chat-composer">
+        <button type="button" class="btn btn--ghost btn--sm" id="chat-back" title="{% trans 'Back' %}">←</button>
+        <input class="form__control" id="chat-input" placeholder="{% trans 'Write a message…' %}" autocomplete="off">
+        <button class="btn btn--primary" type="submit">{% trans "Send" %}</button>
+      </form>
+    </div>
+  </div>
+</div></div>
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script src="{% static 'js/messaging.js' %}"></script>
+{% endblock %}

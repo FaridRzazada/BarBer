@@ -1,0 +1,60 @@
+{% load i18n %}
+{# Expects `professional` annotated via .for_cards(); `is_open`/`is_favorited` set by the view. #}
+<article class="pro-card" data-pro-id="{{ professional.id }}">
+  <div class="pro-card__media">
+    <span class="pro-card__type badge badge--type">{{ professional.type_label }}</span>
+    <div class="pro-card__fav">
+      <button class="fav-btn {% if professional.is_favorited %}is-active{% endif %}"
+              data-fav="{{ professional.id }}"
+              data-auth="{% if user.is_authenticated %}1{% else %}0{% endif %}"
+              data-login-url="{% url 'accounts:login' %}"
+              aria-label="{% trans 'Save to favorites' %}"
+              aria-pressed="{% if professional.is_favorited %}true{% else %}false{% endif %}">
+        <svg viewBox="0 0 24 24"><path d="M12 21s-7-4.5-9.5-9A5.3 5.3 0 0 1 12 6a5.3 5.3 0 0 1 9.5 6c-2.5 4.5-9.5 9-9.5 9z"/></svg>
+      </button>
+    </div>
+    {% if professional.profile_image %}
+      <img src="{{ professional.profile_image.url }}" alt="{{ professional.display_name }}" loading="lazy">
+    {% else %}
+      <div class="pro-card__media-fallback">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 20a8 8 0 0 1 16 0"/><circle cx="12" cy="8" r="4"/></svg>
+      </div>
+    {% endif %}
+  </div>
+  <div class="pro-card__body">
+    <h3 class="pro-card__title">
+      <a href="{{ professional.get_absolute_url }}">{{ professional.display_name }}</a>
+      {% if professional.is_verified %}<span class="badge badge--verified" title="{% trans 'Verified' %}">✓</span>{% endif %}
+    </h3>
+    <div class="pro-card__meta">
+      {% if professional.rating_count %}
+        <span class="rating-inline">
+          <span class="stars"><span class="stars__fill" style="width:{% widthratio professional.rating_avg 5 100 %}%"></span></span>
+          <strong>{{ professional.rating_avg|floatformat:1 }}</strong> ({{ professional.rating_count }})
+        </span>
+      {% else %}
+        <span class="muted">{% trans "No reviews yet" %}</span>
+      {% endif %}
+      {% if professional.city %}<span class="pro-card__loc">{{ professional.city }}</span>{% endif %}
+      {% if professional.is_open %}
+        <span class="badge badge--open"><span class="status-dot status-dot--open"></span>{% trans "Open" %}</span>
+      {% else %}
+        <span class="badge badge--closed"><span class="status-dot status-dot--closed"></span>{% trans "Closed" %}</span>
+      {% endif %}
+    </div>
+    <div class="pro-card__foot">
+      <div>
+        {% if professional.starting_price %}
+          <span class="pro-card__price">{{ professional.starting_price|floatformat:"-2" }} {{ DEFAULT_CURRENCY }} <small>{% trans "from" %}</small></span>
+        {% else %}
+          <span class="muted">{% trans "Price not specified" %}</span>
+        {% endif %}
+        {% if professional.distance_km %}<span class="pro-card__distance">{{ professional.distance_km }} km</span>{% endif %}
+      </div>
+      <div class="pro-card__actions">
+        <a class="btn btn--sm" href="{{ professional.get_absolute_url }}">{% trans "View" %}</a>
+        <a class="btn btn--sm btn--primary" href="{% url 'bookings:create' %}?professional={{ professional.id }}">{% trans "Book" %}</a>
+      </div>
+    </div>
+  </div>
+</article>

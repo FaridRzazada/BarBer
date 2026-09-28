@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{{ product.name }} — {{ professional.display_name }}{% endblock %}
+
+{% block content %}
+<div class="page"><div class="container" style="max-width:920px">
+  <nav class="breadcrumbs"><a href="{{ professional.get_absolute_url }}">← {{ professional.display_name }}</a></nav>
+  <div class="grid" style="grid-template-columns: 1fr 1fr; gap:var(--space-6); align-items:start">
+    <div class="panel" style="overflow:hidden">
+      <div style="aspect-ratio:1; background:var(--color-surface-2)">
+        {% if product.main_image %}<img src="{{ product.main_image.url }}" alt="{{ product.name }}" style="width:100%;height:100%;object-fit:cover">{% endif %}
+      </div>
+      {% if product.images.all %}
+        <div class="media-grid" style="padding:var(--space-3)">
+          {% for img in product.images.all %}<figure><img src="{{ img.image.url }}" alt="{{ img.title }}" loading="lazy"></figure>{% endfor %}
+        </div>
+      {% endif %}
+    </div>
+    <div>
+      {% if product.brand %}<span class="product-card__brand">{{ product.brand }}</span>{% endif %}
+      <h1 style="margin:4px 0">{{ product.name }}</h1>
+      <p class="pro-card__price" style="font-size:1.4rem">{% if product.price %}{{ product.price|floatformat:"-2" }} {{ product.currency }}{% else %}{% trans "Price on request" %}{% endif %}</p>
+      <p>{% if product.is_available %}<span class="badge badge--open">{% trans "Available" %}</span>{% else %}<span class="badge badge--closed">{% trans "Out of stock" %}</span>{% endif %}</p>
+      {% if product.description %}<p>{{ product.description|linebreaks }}</p>{% endif %}
+      <div class="card" style="margin-top:var(--space-4)">
+        <p style="margin:0 0 8px"><strong>{% trans "Sold at" %}</strong> {{ professional.display_name }}</p>
+        {% if professional.phone %}<p class="muted" style="margin:0">📞 {{ professional.phone }}</p>{% endif %}
+        <a class="btn btn--primary" style="margin-top:var(--space-3)" href="{{ professional.get_absolute_url }}">{% trans "Contact salon" %}</a>
+      </div>
+    </div>
+  </div>
+
+  {% if related %}
+    <h2 style="margin-top:var(--space-7)">{% trans "More from this salon" %}</h2>
+    <div class="grid grid--3">
+      {% for p in related %}
+        <a class="product-card" href="{{ p.get_absolute_url }}">
+          <div class="product-card__media">{% if p.main_image %}<img src="{{ p.main_image.url }}" alt="{{ p.name }}" loading="lazy">{% endif %}</div>
+          <div class="product-card__body"><span class="product-card__name">{{ p.name }}</span><span class="product-card__price">{% if p.price %}{{ p.price|floatformat:"-2" }} {{ p.currency }}{% endif %}</span></div>
+        </a>
+      {% endfor %}
+    </div>
+  {% endif %}
+</div></div>
+{% endblock %}

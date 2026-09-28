@@ -1,0 +1,101 @@
+/* ==========================================================================
+   Cards — professional card, service item, product card, review, stat tiles
+   ========================================================================== */
+
+/* Professional card ------------------------------------------------------- */
+.pro-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  transition: box-shadow 0.15s ease, border-color 0.15s ease, transform 0.12s ease;
+}
+.pro-card:hover { box-shadow: var(--shadow-md); border-color: var(--color-border-strong); }
+.pro-card.is-highlight { border-color: var(--color-accent); box-shadow: 0 0 0 2px var(--color-accent-soft); }
+
+.pro-card__media { position: relative; aspect-ratio: 16 / 10; background: var(--color-surface-2); }
+.pro-card__media img { width: 100%; height: 100%; object-fit: cover; }
+.pro-card__media-fallback { width: 100%; height: 100%; display: grid; place-items: center; color: var(--color-border-strong); }
+.pro-card__media-fallback svg { width: 40px; height: 40px; }
+.pro-card__fav { position: absolute; top: var(--space-3); right: var(--space-3); }
+.pro-card__type { position: absolute; top: var(--space-3); left: var(--space-3); }
+
+.pro-card__body { padding: var(--space-4); display: flex; flex-direction: column; gap: var(--space-2); flex: 1; }
+.pro-card__title { display: flex; align-items: center; gap: 6px; margin: 0; font-size: 1.08rem; }
+.pro-card__title a { color: var(--color-heading); }
+.pro-card__title a:hover { color: var(--color-accent); }
+.pro-card__meta { display: flex; align-items: center; gap: var(--space-3); color: var(--color-muted); font-size: 0.88rem; flex-wrap: wrap; }
+.pro-card__loc { display: inline-flex; align-items: center; gap: 4px; }
+.pro-card__loc svg { width: 14px; height: 14px; }
+.pro-card__foot { margin-top: auto; padding-top: var(--space-3); display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); border-top: 1px solid var(--color-border); }
+.pro-card__price { font-weight: 700; color: var(--color-heading); }
+.pro-card__price small { font-weight: 500; color: var(--color-muted); }
+.pro-card__actions { display: flex; gap: var(--space-2); }
+.pro-card__distance { font-size: 0.82rem; color: var(--color-accent); font-weight: 600; }
+
+/* Service item ------------------------------------------------------------ */
+.service-list { display: grid; gap: var(--space-2); }
+.service-item {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--space-4);
+  padding: var(--space-4); border: 1px solid var(--color-border); border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+.service-item__name { font-weight: 600; color: var(--color-heading); }
+.service-item__desc { color: var(--color-muted); font-size: 0.9rem; }
+.service-item__meta { display: flex; align-items: center; gap: var(--space-4); }
+.service-item__duration { color: var(--color-muted); font-size: 0.88rem; display: inline-flex; align-items: center; gap: 4px; }
+.service-item__price { font-weight: 700; color: var(--color-heading); white-space: nowrap; }
+
+.service-cat { margin-bottom: var(--space-5); }
+.service-cat__title { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--color-muted); margin-bottom: var(--space-3); }
+
+/* Product card ------------------------------------------------------------ */
+.product-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md); overflow: hidden; display: flex; flex-direction: column; }
+.product-card:hover { box-shadow: var(--shadow-sm); }
+.product-card__media { aspect-ratio: 1; background: var(--color-surface-2); }
+.product-card__media img { width: 100%; height: 100%; object-fit: cover; }
+.product-card__body { padding: var(--space-4); display: flex; flex-direction: column; gap: 4px; flex: 1; }
+.product-card__brand { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-muted); }
+.product-card__name { font-weight: 600; color: var(--color-heading); }
+.product-card__price { margin-top: auto; font-weight: 700; color: var(--color-heading); }
+
+/* Review card ------------------------------------------------------------- */
+.review { padding: var(--space-4) 0; border-bottom: 1px solid var(--color-border); }
+.review:last-child { border-bottom: none; }
+.review__head { display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-2); }
+.review__name { font-weight: 600; color: var(--color-heading); }
+.review__date { color: var(--color-muted); font-size: 0.84rem; }
+.review__body { color: var(--color-text); }
+
+.rating-summary { display: flex; gap: var(--space-6); align-items: center; flex-wrap: wrap; }
+.rating-summary__score { font-size: 3rem; font-weight: 700; color: var(--color-heading); line-height: 1; }
+.rating-bars { flex: 1; min-width: 220px; display: grid; gap: 6px; }
+.rating-bar { display: flex; align-items: center; gap: var(--space-2); font-size: 0.82rem; color: var(--color-muted); }
+.rating-bar__track { flex: 1; height: 8px; background: var(--color-surface-2); border-radius: var(--radius-pill); overflow: hidden; }
+.rating-bar__fill { height: 100%; background: var(--color-star); }
+
+/* Stat tiles (dashboards) ------------------------------------------------- */
+.stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: var(--space-4); }
+.stat {
+  background: var(--color-surface); border: 1px solid var(--color-border);
+  border-radius: var(--radius-md); padding: var(--space-4) var(--space-5);
+}
+.stat__label { color: var(--color-muted); font-size: 0.85rem; font-weight: 500; }
+.stat__value { font-size: 1.9rem; font-weight: 700; color: var(--color-heading); line-height: 1.2; }
+.stat__hint { font-size: 0.8rem; color: var(--color-muted); }
+
+/* Team member card -------------------------------------------------------- */
+.team-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: var(--space-4); }
+.team-card { text-align: center; padding: var(--space-5); border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface); }
+.team-card .avatar { margin: 0 auto var(--space-3); }
+.team-card__name { font-weight: 600; color: var(--color-heading); }
+.team-card__role { color: var(--color-muted); font-size: 0.88rem; }
+
+/* Gallery / portfolio grid ------------------------------------------------ */
+.media-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: var(--space-3); }
+.media-grid figure { margin: 0; border-radius: var(--radius-md); overflow: hidden; background: var(--color-surface-2); aspect-ratio: 1; position: relative; }
+.media-grid img { width: 100%; height: 100%; object-fit: cover; }
+.media-grid__caption { position: absolute; bottom: 0; left: 0; right: 0; padding: 6px 10px; background: linear-gradient(transparent, rgba(0,0,0,0.55)); color: #fff; font-size: 0.8rem; }
+.media-grid__del { position: absolute; top: 6px; right: 6px; }

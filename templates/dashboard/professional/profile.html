@@ -1,0 +1,56 @@
+{% extends "dashboard/base.html" %}
+{% load i18n static %}
+{% block title %}{% trans "Edit profile" %} — {{ SITE_NAME }}{% endblock %}
+{% block head_extra %}<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">{% endblock %}
+
+{% block dash %}
+<div class="dash-header"><div><h1>{% trans "Profile" %}</h1><p>{% trans "This is what customers see." %}</p></div></div>
+
+<form method="post" enctype="multipart/form-data" class="form">
+  {% csrf_token %}
+  <div class="panel" style="padding:var(--space-5); margin-bottom:var(--space-5)">
+    <h3>{% trans "Basic information" %}</h3>
+    {% include "includes/form_field.html" with field=profile_form.display_name %}
+    {% include "includes/form_field.html" with field=profile_form.description %}
+    <div class="form__grid">
+      {% include "includes/form_field.html" with field=profile_form.phone %}
+      {% include "includes/form_field.html" with field=profile_form.public_email %}
+    </div>
+    {% include "includes/form_field.html" with field=profile_form.website %}
+  </div>
+
+  <div class="panel" style="padding:var(--space-5); margin-bottom:var(--space-5)">
+    <h3>{% if professional.is_barber %}{% trans "Barber details" %}{% else %}{% trans "Salon details" %}{% endif %}</h3>
+    {% for field in sub_form %}{% include "includes/form_field.html" with field=field %}{% endfor %}
+  </div>
+
+  <div class="panel" style="padding:var(--space-5); margin-bottom:var(--space-5)">
+    <h3>{% trans "Location" %}</h3>
+    {% include "includes/form_field.html" with field=profile_form.address %}
+    {% include "includes/form_field.html" with field=profile_form.city %}
+    <p class="location-hint">{% trans "Click on the map to set your exact location, or drag the pin." %}
+      <button type="button" class="btn btn--ghost btn--sm" id="location-use-gps">{% trans "Use my current location" %}</button>
+    </p>
+    <div id="location-picker" class="location-picker"></div>
+    <div class="form__grid" style="margin-top:var(--space-3)">
+      {% include "includes/form_field.html" with field=profile_form.latitude %}
+      {% include "includes/form_field.html" with field=profile_form.longitude %}
+    </div>
+  </div>
+
+  <div class="panel" style="padding:var(--space-5); margin-bottom:var(--space-5)">
+    <h3>{% trans "Photos" %}</h3>
+    <div class="form__grid">
+      {% include "includes/form_field.html" with field=profile_form.profile_image %}
+      {% include "includes/form_field.html" with field=profile_form.cover_image %}
+    </div>
+  </div>
+
+  <button class="btn btn--primary btn--lg" type="submit">{% trans "Save profile" %}</button>
+</form>
+{% endblock %}
+
+{% block extra_js %}{{ block.super }}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="{% static 'js/profile.js' %}"></script>
+{% endblock %}

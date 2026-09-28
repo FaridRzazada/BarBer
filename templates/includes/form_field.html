@@ -1,0 +1,15 @@
+{% load i18n %}
+{% if field.field.widget.input_type == "checkbox" %}
+  <div class="form__row form__check">
+    {{ field }}
+    <label class="form__label" for="{{ field.id_for_label }}" style="margin:0">{{ field.label }}</label>
+    {% for e in field.errors %}<div class="form__error">{{ e }}</div>{% endfor %}
+  </div>
+{% else %}
+  <div class="form__row {% if field.errors %}has-error{% endif %}">
+    <label class="form__label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+    {{ field }}
+    {% for e in field.errors %}<div class="form__error">{{ e }}</div>{% endfor %}
+    {% if field.help_text %}<div class="form__help">{{ field.help_text }}</div>{% endif %}
+  </div>
+{% endif %}

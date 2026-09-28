@@ -1,0 +1,97 @@
+{% load static i18n %}
+<header class="navbar">
+  <div class="container navbar__inner">
+    <a class="brand" href="{% url 'core:home' %}">
+      <span class="brand__mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4 8.5 15.5M14.5 14 20 20M8.5 8.5 11 11"/></svg>
+      </span>
+      {{ SITE_NAME }}
+    </a>
+
+    <nav class="nav__links" aria-label="{% trans 'Primary' %}">
+      {% if user.is_authenticated and user.is_professional %}
+        <a class="nav__link" href="{% url 'dashboard:index' %}">{% trans "Dashboard" %}</a>
+        <a class="nav__link" href="{% url 'dashboard:appointments' %}">{% trans "Appointments" %}</a>
+        <a class="nav__link" href="{% url 'dashboard:profile' %}">{% trans "Profile" %}</a>
+        <a class="nav__link" href="{% url 'core:find' %}">{% trans "Explore" %}</a>
+      {% else %}
+        <a class="nav__link" href="{% url 'professionals:list' %}?type=barber">{% trans "Find a Barber" %}</a>
+        <a class="nav__link" href="{% url 'professionals:list' %}?type=salon">{% trans "Salons" %}</a>
+        <a class="nav__link" href="{% url 'core:map' %}">{% trans "Map" %}</a>
+        {% if user.is_authenticated %}
+          <a class="nav__link" href="{% url 'bookings:history' %}">{% trans "Bookings" %}</a>
+          <a class="nav__link" href="{% url 'favorites:index' %}">{% trans "Favorites" %}</a>
+        {% endif %}
+      {% endif %}
+    </nav>
+
+    <span class="nav__spacer"></span>
+
+    <div class="nav__actions">
+      {% if user.is_authenticated %}
+        <div class="usermenu" id="notif-menu">
+          <button class="icon-btn" id="notif-bell" data-toggle="#notif-dropdown" data-toggle-class="is-open"
+                  aria-label="{% trans 'Notifications' %}" aria-haspopup="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+            <span class="icon-btn__badge" id="notif-badge" {% if not unread_notifications_count %}hidden{% endif %}>{{ unread_notifications_count }}</span>
+          </button>
+          {% include "includes/notification_dropdown.html" %}
+        </div>
+
+        <a class="icon-btn" href="{% url 'messaging:index' %}" aria-label="{% trans 'Messages' %}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </a>
+
+        <div class="usermenu" id="usermenu">
+          <button class="usermenu__trigger" data-toggle="#usermenu" data-toggle-class="is-open" aria-haspopup="true">
+            <span class="avatar">{% if user.avatar %}<img src="{{ user.avatar.url }}" alt="">{% else %}{{ user.display_name|first|upper }}{% endif %}</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <div class="usermenu__panel">
+            <a class="usermenu__item" href="{% url 'dashboard:index' %}">{% trans "Dashboard" %}</a>
+            {% if user.is_customer %}
+              <a class="usermenu__item" href="{% url 'bookings:history' %}">{% trans "My bookings" %}</a>
+              <a class="usermenu__item" href="{% url 'favorites:index' %}">{% trans "Favorites" %}</a>
+            {% endif %}
+            <a class="usermenu__item" href="{% url 'notifications:index' %}">{% trans "Notifications" %}</a>
+            <a class="usermenu__item" href="{% url 'dashboard:settings' %}">{% trans "Settings" %}</a>
+            <div class="usermenu__divider"></div>
+            <form method="post" action="{% url 'accounts:logout' %}">{% csrf_token %}
+              <button type="submit" class="usermenu__item" style="width:100%;text-align:left;background:none;border:none;cursor:pointer;font:inherit;color:inherit">{% trans "Log out" %}</button>
+            </form>
+          </div>
+        </div>
+      {% else %}
+        <a class="btn btn--ghost btn--sm" href="{% url 'accounts:login' %}">{% trans "Log in" %}</a>
+        <a class="btn btn--primary btn--sm" href="{% url 'accounts:register' %}">{% trans "Sign up" %}</a>
+      {% endif %}
+
+      <button class="nav__toggle" aria-label="{% trans 'Menu' %}" aria-expanded="false" data-toggle=".nav__mobile" data-toggle-class="is-open">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="nav__mobile">
+    {% if user.is_authenticated and user.is_professional %}
+      <a class="nav__link" href="{% url 'dashboard:index' %}">{% trans "Dashboard" %}</a>
+      <a class="nav__link" href="{% url 'dashboard:appointments' %}">{% trans "Appointments" %}</a>
+      <a class="nav__link" href="{% url 'dashboard:profile' %}">{% trans "Profile" %}</a>
+    {% else %}
+      <a class="nav__link" href="{% url 'professionals:list' %}?type=barber">{% trans "Find a Barber" %}</a>
+      <a class="nav__link" href="{% url 'professionals:list' %}?type=salon">{% trans "Salons" %}</a>
+      <a class="nav__link" href="{% url 'core:map' %}">{% trans "Map" %}</a>
+    {% endif %}
+    {% if user.is_authenticated %}
+      {% if user.is_customer %}
+        <a class="nav__link" href="{% url 'bookings:history' %}">{% trans "Bookings" %}</a>
+        <a class="nav__link" href="{% url 'favorites:index' %}">{% trans "Favorites" %}</a>
+      {% endif %}
+      <a class="nav__link" href="{% url 'messaging:index' %}">{% trans "Messages" %}</a>
+      <a class="nav__link" href="{% url 'dashboard:settings' %}">{% trans "Settings" %}</a>
+    {% else %}
+      <a class="nav__link" href="{% url 'accounts:login' %}">{% trans "Log in" %}</a>
+      <a class="nav__link" href="{% url 'accounts:register' %}">{% trans "Sign up" %}</a>
+    {% endif %}
+  </div>
+</header>

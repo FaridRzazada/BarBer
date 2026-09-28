@@ -1,0 +1,46 @@
+{% extends "dashboard/base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Team" %} — {{ SITE_NAME }}{% endblock %}
+
+{% block dash %}
+<div class="dash-header"><div><h1>{% trans "Your team" %}</h1><p>{% trans "Add existing barbers to your salon. Each barber keeps their own account." %}</p></div></div>
+
+<div class="grid" style="grid-template-columns: 1.4fr 1fr; align-items:start; gap:var(--space-5)">
+  <div>
+    {% if members %}
+      <div class="table-wrap">
+        <table class="data">
+          <thead><tr><th>{% trans "Barber" %}</th><th>{% trans "Position" %}</th><th>{% trans "Status" %}</th><th>{% trans "Actions" %}</th></tr></thead>
+          <tbody>
+            {% for m in members %}
+            <tr>
+              <td>{{ m.barber.professional.display_name }}<br><small class="muted">{{ m.barber.professional.user.email }}</small></td>
+              <td>{{ m.position|default:"—" }}</td>
+              <td>{% if m.is_active %}<span class="status status--confirmed">{% trans "Active" %}</span>{% else %}<span class="status status--no_show">{% trans "Inactive" %}</span>{% endif %}</td>
+              <td class="actions">
+                <form method="post" class="cluster">{% csrf_token %}
+                  <input type="hidden" name="member" value="{{ m.pk }}">
+                  <button class="btn btn--sm" name="action" value="toggle">{% if m.is_active %}{% trans "Deactivate" %}{% else %}{% trans "Activate" %}{% endif %}</button>
+                  <button class="btn btn--sm btn--danger" name="action" value="remove">{% trans "Remove" %}</button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="empty-state"><h3>{% trans "No team members yet" %}</h3><p>{% trans "Add a barber by their account email." %}</p></div>
+    {% endif %}
+  </div>
+  <div class="panel" style="padding:var(--space-5)">
+    <h3>{% trans "Add a barber" %}</h3>
+    <form method="post" class="form">
+      {% csrf_token %}<input type="hidden" name="action" value="add">
+      {% for field in form %}{% include "includes/form_field.html" with field=field %}{% endfor %}
+      <button class="btn btn--primary btn--block">{% trans "Add to team" %}</button>
+    </form>
+    <p class="form__help" style="margin-top:var(--space-2)">{% trans "The barber must already have a professional (barber) account." %}</p>
+  </div>
+</div>
+{% endblock %}

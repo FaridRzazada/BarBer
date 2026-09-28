@@ -1,0 +1,15 @@
+# Core
+Django==5.2.4
+djangorestframework==3.16.0
+djangorestframework-simplejwt==5.5.1
+
+# Configuration & environment
+django-environ==0.14.0
+django-cors-headers==4.9.0
+django-filter==26.1
+
+# Database driver (PostgreSQL — production)
+psycopg[binary]==3.3.6
+
+# Images
+Pillow==11.2.1

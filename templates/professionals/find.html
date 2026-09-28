@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% load static i18n %}
+{% block title %}{% trans "Find barbers & salons nearby" %} — {{ SITE_NAME }}{% endblock %}
+{% block head_extra %}<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<div class="find-layout show-list" data-find-page>
+  <!-- Filters -->
+  <aside class="find-filters">
+    <div class="filter-group">
+      <div class="filter-group__title">{% trans "Search" %}</div>
+      <input class="form__control" type="text" data-filter="q" value="{{ initial_query }}" placeholder="{% trans 'Barber, service, name…' %}">
+    </div>
+    <div class="filter-group">
+      <div class="filter-group__title">{% trans "Type" %}</div>
+      <div class="pill-group type-pills">
+        <button type="button" data-type="all" class="{% if initial_type == 'all' %}is-active{% endif %}">{% trans "All" %}</button>
+        <button type="button" data-type="barber" class="{% if initial_type == 'barber' %}is-active{% endif %}">{% trans "Barbers" %}</button>
+        <button type="button" data-type="salon" class="{% if initial_type == 'salon' %}is-active{% endif %}">{% trans "Salons" %}</button>
+      </div>
+    </div>
+    <div class="filter-group">
+      <div class="filter-group__title">{% trans "City" %}</div>
+      <input class="form__control" type="text" data-filter="city" value="{{ initial_city }}" list="cities-list" placeholder="{% trans 'Any city' %}">
+      <datalist id="cities-list">{% for c in cities %}<option value="{{ c.name }}">{% endfor %}</datalist>
+    </div>
+    <div class="filter-group">
+      <div class="filter-group__title">{% trans "Service" %}</div>
+      <select class="form__control" data-filter="service">
+        <option value="">{% trans "Any service" %}</option>
+        {% for c in categories %}<option value="{{ c.slug }}">{{ c.name }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="filter-group">
+      <div class="filter-group__title">{% trans "Minimum rating" %}</div>
+      <select class="form__control" data-filter="rating">
+        <option value="">{% trans "Any rating" %}</option>
+        <option value="3">3★ +</option><option value="4">4★ +</option><option value="4.5">4.5★ +</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label class="form__check"><input type="checkbox" class="form__check-input" data-filter="open_now"> {% trans "Open now" %}</label>
+      <label class="form__check"><input type="checkbox" class="form__check-input" data-filter="price_available"> {% trans "Price listed" %}</label>
+    </div>
+    <div class="filter-group">
+      <div class="filter-group__title">{% trans "Sort by" %}</div>
+      <select class="form__control" data-filter="sort">
+        <option value="nearest">{% trans "Nearest" %}</option>
+        <option value="rating">{% trans "Rating" %}</option>
+        <option value="newest">{% trans "Newest" %}</option>
+        <option value="price_low">{% trans "Price: low to high" %}</option>
+        <option value="price_high">{% trans "Price: high to low" %}</option>
+      </select>
+    </div>
+    <button class="btn btn--primary btn--block" data-use-location>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
+      {% trans "Use my location" %}
+    </button>
+  </aside>
+
+  <!-- Results -->
+  <section class="find-results">
+    <div class="find-toolbar">
+      <span class="find-count" data-count>{% trans "Loading…" %}</span>
+      <div class="pill-group mobile-view-toggle">
+        <button type="button" data-view="list" class="is-active">{% trans "List" %}</button>
+        <button type="button" data-view="map">{% trans "Map" %}</button>
+      </div>
+    </div>
+    <div class="find-results__list" data-results></div>
+  </section>
+
+  <!-- Map -->
+  <div class="find-map">
+    <div id="map"></div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+  <script src="{% static 'js/map.js' %}"></script>
+  <script src="{% static 'js/search.js' %}"></script>
+{% endblock %}

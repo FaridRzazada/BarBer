@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Create an account" %} — {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container auth-shell">
+  <h1 class="text-center">{% trans "Join Nearby" %}</h1>
+  <p class="text-center muted">{% trans "How would you like to use Nearby?" %}</p>
+
+  <div class="stack" style="margin-top: var(--space-5)">
+    <a class="card" href="{% url 'accounts:register_customer' %}" style="display:block">
+      <h3 style="margin-bottom:4px">{% trans "I'm a customer" %}</h3>
+      <p class="muted" style="margin:0">{% trans "Discover barbers and salons near you and book appointments." %}</p>
+    </a>
+    <a class="card" href="{% url 'accounts:register_professional' %}" style="display:block">
+      <h3 style="margin-bottom:4px">{% trans "I'm a professional" %}</h3>
+      <p class="muted" style="margin:0">{% trans "I run a barber shop or salon and want to take bookings." %}</p>
+    </a>
+  </div>
+  <p class="auth-alt">{% trans "Already have an account?" %} <a href="{% url 'accounts:login' %}">{% trans "Log in" %}</a></p>
+</div>
+{% endblock %}

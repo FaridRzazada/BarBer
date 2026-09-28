@@ -1,0 +1,11 @@
+Appointment cancelled
+
+{% if by_customer %}{{ customer.display_name }} cancelled their appointment.{% else %}Your appointment with {{ professional.display_name }} was cancelled.{% endif %}
+
+Service: {{ service.name }}
+Date:    {{ booking.date }}
+Time:    {{ booking.start_time|time:"H:i" }}–{{ booking.end_time|time:"H:i" }}
+
+{{ booking_url }}
+
+— {{ SITE_NAME }}

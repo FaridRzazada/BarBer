@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Booking" %} #{{ booking.id }} — {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="page"><div class="container" style="max-width:760px">
+  {% if request.GET.created %}
+    <div class="card" style="border-left:4px solid var(--color-success); margin-bottom:var(--space-5)">
+      <h2 style="margin:0 0 4px">{% trans "Booking confirmed" %} 🎉</h2>
+      <p class="muted" style="margin:0">{% trans "Your request has been sent. You'll be notified when it's confirmed." %}</p>
+    </div>
+  {% endif %}
+
+  <nav class="breadcrumbs"><a href="{% url 'bookings:history' %}">← {% trans "My bookings" %}</a></nav>
+
+  <div class="panel" style="padding:var(--space-6)">
+    <div class="cluster" style="justify-content:space-between">
+      <h1 style="margin:0">{{ booking.service.name }}</h1>
+      <span class="status status--{{ booking.status }}">{{ booking.get_status_display }}</span>
+    </div>
+    <p class="muted">{{ booking.professional.display_name }}{% if booking.barber %} · {{ booking.barber.professional.display_name }}{% endif %}</p>
+
+    <dl style="margin-top:var(--space-4)">
+      <div class="summary-row"><dt>{% trans "Date" %}</dt><dd>{{ booking.date|date:"l, j F Y" }}</dd></div>
+      <div class="summary-row"><dt>{% trans "Time" %}</dt><dd>{{ booking.start_time|time:"H:i" }}–{{ booking.end_time|time:"H:i" }}</dd></div>
+      <div class="summary-row"><dt>{% trans "Duration" %}</dt><dd>{{ booking.service.duration_minutes }} {% trans "min" %}</dd></div>
+      {% if booking.service.show_price and booking.service.price %}<div class="summary-row"><dt>{% trans "Price" %}</dt><dd>{{ booking.service.price|floatformat:"-2" }} {{ DEFAULT_CURRENCY }}</dd></div>{% endif %}
+      {% if is_pro_owner %}<div class="summary-row"><dt>{% trans "Customer" %}</dt><dd>{{ booking.customer.display_name }} · {{ booking.customer.phone }}</dd></div>{% endif %}
+      {% if booking.notes %}<div class="summary-row"><dt>{% trans "Notes" %}</dt><dd>{{ booking.notes }}</dd></div>{% endif %}
+    </dl>
+
+    <div class="cluster" style="margin-top:var(--space-5)">
+      {% if is_pro_owner %}
+        <form method="post" class="cluster">{% csrf_token %}
+          {% if booking.status == 'pending' %}<button class="btn btn--primary" name="action" value="confirm">{% trans "Confirm" %}</button>{% endif %}
+          {% if booking.status == 'pending' or booking.status == 'confirmed' %}
+            <button class="btn" name="action" value="complete">{% trans "Mark completed" %}</button>
+            <button class="btn" name="action" value="no_show">{% trans "No-show" %}</button>
+            <button class="btn btn--danger" name="action" value="cancel" formnovalidate>{% trans "Cancel" %}</button>
+          {% endif %}
+        </form>
+      {% endif %}
+      {% if is_customer_owner and booking.can_customer_cancel %}
+        <form method="post" data-confirm="{% trans 'Cancel this booking?' %}">{% csrf_token %}
+          <button class="btn btn--danger" name="action" value="cancel">{% trans "Cancel booking" %}</button>
+        </form>
+      {% endif %}
+      <a class="btn btn--ghost" href="{{ booking.professional.get_absolute_url }}">{% trans "View professional" %}</a>
+      <a class="btn btn--primary" href="{% url 'bookings:create' %}?professional={{ booking.professional.id }}">{% trans "Book again" %}</a>
+    </div>
+  </div>
+
+  {% if review_form %}
+    <div class="panel" style="padding:var(--space-6); margin-top:var(--space-5)">
+      <h2>{% trans "Leave a review" %}</h2>
+      <form method="post" class="form">{% csrf_token %}
+        <input type="hidden" name="action" value="review">
+        <div class="form__row">
+          <label class="form__label">{{ review_form.rating.label }}</label>
+          <div class="cluster">{% for radio in review_form.rating %}<label class="cluster" style="gap:4px">{{ radio.tag }} {{ radio.choice_label }}</label>{% endfor %}</div>
+        </div>
+        {% include "includes/form_field.html" with field=review_form.comment %}
+        <button class="btn btn--primary" type="submit">{% trans "Submit review" %}</button>
+      </form>
+    </div>
+  {% elif booking.status == 'completed' and is_customer_owner %}
+    <p class="muted" style="margin-top:var(--space-4)">{% trans "Thanks — you've already reviewed this visit." %}</p>
+  {% endif %}
+</div></div>
+{% endblock %}

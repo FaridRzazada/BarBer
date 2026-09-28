@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "About" %} — {{ SITE_NAME }}{% endblock %}
+{% block content %}
+<div class="page"><div class="container" style="max-width:760px">
+  <p class="eyebrow">{% trans "About" %}</p>
+  <h1>{% trans "Booking barbers and salons, made simple." %}</h1>
+  <p class="lead">{% blocktrans %}{{ SITE_NAME }} connects people with great local barbers and salons. Find professionals near you, browse their work, and book a time that fits — in a few clicks.{% endblocktrans %}</p>
+  <div class="grid grid--3" style="margin-top:var(--space-6)">
+    <div class="card"><h3>{% trans "For customers" %}</h3><p class="muted">{% trans "Discover nearby professionals, compare services and reviews, and book instantly." %}</p></div>
+    <div class="card"><h3>{% trans "For barbers" %}</h3><p class="muted">{% trans "Build your profile, showcase your portfolio and manage appointments." %}</p></div>
+    <div class="card"><h3>{% trans "For salons" %}</h3><p class="muted">{% trans "Manage your team, services and products in one place." %}</p></div>
+  </div>
+</div></div>
+{% endblock %}

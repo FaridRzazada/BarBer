@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Log in" %} — {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container auth-shell">
+  <div class="auth-card">
+    <h1>{% trans "Welcome back" %}</h1>
+    <p class="muted">{% trans "Log in to manage your bookings and profile." %}</p>
+
+    {% if form.non_field_errors %}
+      <div class="formset-errors">{{ form.non_field_errors }}</div>
+    {% endif %}
+
+    <form method="post" class="form" novalidate>
+      {% csrf_token %}
+      {% include "includes/form_field.html" with field=form.username %}
+      {% include "includes/form_field.html" with field=form.password %}
+      {% include "includes/form_field.html" with field=form.remember_me %}
+      <input type="hidden" name="next" value="{{ next }}">
+      <button class="btn btn--primary btn--block btn--lg" type="submit">{% trans "Log in" %}</button>
+    </form>
+
+    <p class="auth-alt"><a href="{% url 'accounts:password_reset' %}">{% trans "Forgot your password?" %}</a></p>
+  </div>
+  <p class="auth-alt">{% trans "New here?" %} <a href="{% url 'accounts:register' %}">{% trans "Create an account" %}</a></p>
+</div>
+{% endblock %}
